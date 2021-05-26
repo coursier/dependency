@@ -27,10 +27,10 @@ trait DependencyPublishModule extends PublishModule {
   import mill.scalalib.publish._
   def pomSettings = PomSettings(
     description = artifactName(),
-    organization = "sh.almond",
-    url = "https://github.com/almond-sh/almond",
+    organization = "io.get-coursier",
+    url = "https://github.com/coursier/dependency",
     licenses = Seq(License.`BSD-3-Clause`),
-    versionControl = VersionControl.github("lihaoyi", "ammonite"),
+    versionControl = VersionControl.github("coursier", "dependency"),
     developers = Seq(
       Developer("alexarchambault", "Alex Archambault","https://github.com/alexarchambault")
     )
