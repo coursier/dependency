@@ -122,7 +122,7 @@ Exclusions can be specified in the string representations of dependencies:
 ```scala mdoc
 val depWithExclusions = dep"io.get-coursier::coursier:2.0.6,exclude=io.argonaut%%argonaut,exclude=org.fusesource.jansi%jansi"
 
-assert(depWithExclusions.exclude == Set(mod"io.argonaut::argonaut", mod"org.fusesource.jansi:jansi"))
+assert(depWithExclusions.exclude == CovariantSet(mod"io.argonaut::argonaut", mod"org.fusesource.jansi:jansi"))
 ```
 
 (Note the use of `%` as a separator in excluded dependencies).

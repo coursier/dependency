@@ -24,32 +24,137 @@ object Extensions {
       case Some(value) => '{Some(${Expr(value)})}
     }
 
-  private def nameAttr(nameAttr: NameAttributes)(using Quotes): Expr[NameAttributes] =
+  private def simpleNameAttr(nameAttr: NameAttributes)(using Quotes): Expr[NameAttributes] =
     nameAttr match {
       case NoAttributes => '{NoAttributes}
       case ScalaNameAttributes(fullCrossVersion, platform) =>
         '{ScalaNameAttributes(${option(fullCrossVersion)}, ${option(platform)})}
     }
 
-  private def module(mod: ModuleLike[NameAttributes], mappings: Mappings)(using Quotes): Expr[ModuleLike[NameAttributes]] =
+  private def noAttrModule(mod: ModuleLike[NameAttributes], mappings: Mappings)(using Quotes): Expr[ModuleLike[NoAttributes.type]] =
     '{
-      ModuleLike(
+      ModuleLike[NoAttributes.type](
         ${mappings.Expr(mod.organization)},
         ${mappings.Expr(mod.name)},
-        ${nameAttr(mod.nameAttributes)},
+        NoAttributes,
+        ${mappings.mapStringString(mod.attributes)}
+      )
+    }
+
+  private def scalaAttrModule(mod: ModuleLike[NameAttributes], mappings: Mappings)(using Quotes): Expr[ModuleLike[ScalaNameAttributes]] =
+    '{
+      ModuleLike[ScalaNameAttributes](
+        ${mappings.Expr(mod.organization)},
+        ${mappings.Expr(mod.name)},
+        ScalaNameAttributes(${option(mod.nameAttributes.asInstanceOf[ScalaNameAttributes].fullCrossVersion)}, ${option(mod.nameAttributes.asInstanceOf[ScalaNameAttributes].platform)}),
+        ${mappings.mapStringString(mod.attributes)}
+      )
+    }
+
+  private def module(mod: ModuleLike[NameAttributes], mappings: Mappings)(using Quotes): Expr[ModuleLike[NameAttributes]] =
+    if (mod.nameAttributes == NoAttributes)
+      '{
+        ModuleLike[NoAttributes.type](
+          ${mappings.Expr(mod.organization)},
+          ${mappings.Expr(mod.name)},
+          NoAttributes,
+          ${mappings.mapStringString(mod.attributes)}
+        )
+      }
+    else
+      '{
+        ModuleLike[ScalaNameAttributes](
+          ${mappings.Expr(mod.organization)},
+          ${mappings.Expr(mod.name)},
+          ScalaNameAttributes(${option(mod.nameAttributes.asInstanceOf[ScalaNameAttributes].fullCrossVersion)}, ${option(mod.nameAttributes.asInstanceOf[ScalaNameAttributes].platform)}),
+          ${mappings.mapStringString(mod.attributes)}
+        )
+      }
+
+  private def simpleModule(mod: ModuleLike[NameAttributes], mappings: Mappings)(using Quotes): Expr[ModuleLike[NameAttributes]] =
+    '{
+      ModuleLike[NameAttributes](
+        ${mappings.Expr(mod.organization)},
+        ${mappings.Expr(mod.name)},
+        ${simpleNameAttr(mod.nameAttributes)},
         ${mappings.mapStringString(mod.attributes)}
       )
     }
 
   private def dependency(dep: DependencyLike[NameAttributes, NameAttributes], mappings: Mappings)(using Quotes): Expr[DependencyLike[NameAttributes, NameAttributes]] = {
-    val excludes = dep.exclude.toVector.sortBy(_.toString).map(module(_, mappings))
-    '{
-      DependencyLike(
-        ${module(dep.module, mappings)},
-        ${mappings.Expr(dep.version)},
-        Set(${Varargs(excludes)}: _*),
-        ${mappings.mapStringStringOption(dep.userParams)}
-      )
+    val hasScalaMod = dep.module.nameAttributes != NoAttributes
+    val allJavaExcludes = dep.exclude.forall(_.nameAttributes == NoAttributes)
+    val allScalaExcludes = dep.exclude.forall(_.nameAttributes.isInstanceOf[ScalaNameAttributes])
+    val hasExcludes = dep.exclude.nonEmpty
+
+    // can't find a reasonable way to abstract over this with the quoted API…
+    (hasScalaMod, hasExcludes, allJavaExcludes, allScalaExcludes) match {
+      case (false, false, _, _) | (false, true, true, _) =>
+        val module0 = noAttrModule(dep.module, mappings)
+        val excludes = dep.exclude.toVector.sortBy(_.toString).map(noAttrModule(_, mappings))
+        '{
+          DependencyLike[NoAttributes.type, NoAttributes.type](
+            $module0,
+            ${mappings.Expr(dep.version)},
+            CovariantSet(${Varargs(excludes)}: _*),
+            ${mappings.mapStringStringOption(dep.userParams)}
+          )
+        }
+      case (false, true, false, true) =>
+        val module0 = noAttrModule(dep.module, mappings)
+        val excludes = dep.exclude.toVector.sortBy(_.toString).map(scalaAttrModule(_, mappings))
+        '{
+          DependencyLike[NoAttributes.type, ScalaNameAttributes](
+            $module0,
+            ${mappings.Expr(dep.version)},
+            CovariantSet(${Varargs(excludes)}: _*),
+            ${mappings.mapStringStringOption(dep.userParams)}
+          )
+        }
+      case (false, _, _, _) =>
+        val module0 = noAttrModule(dep.module, mappings)
+        val excludes = dep.exclude.toVector.sortBy(_.toString).map(simpleModule(_, mappings))
+        '{
+          DependencyLike[NoAttributes.type, NameAttributes](
+            $module0,
+            ${mappings.Expr(dep.version)},
+            CovariantSet(${Varargs(excludes)}: _*),
+            ${mappings.mapStringStringOption(dep.userParams)}
+          )
+        }
+      case (true, false, _, _) | (true, true, true, _) =>
+        val module0 = scalaAttrModule(dep.module, mappings)
+        val excludes = dep.exclude.toVector.sortBy(_.toString).map(noAttrModule(_, mappings))
+        '{
+          DependencyLike[ScalaNameAttributes, NoAttributes.type](
+            $module0,
+            ${mappings.Expr(dep.version)},
+            CovariantSet(${Varargs(excludes)}: _*),
+            ${mappings.mapStringStringOption(dep.userParams)}
+          )
+        }
+      case (true, true, false, true) =>
+        val module0 = scalaAttrModule(dep.module, mappings)
+        val excludes = dep.exclude.toVector.sortBy(_.toString).map(scalaAttrModule(_, mappings))
+        '{
+          DependencyLike[ScalaNameAttributes, ScalaNameAttributes](
+            $module0,
+            ${mappings.Expr(dep.version)},
+            CovariantSet(${Varargs(excludes)}: _*),
+            ${mappings.mapStringStringOption(dep.userParams)}
+          )
+        }
+      case (true, _, _, _) =>
+        val module0 = scalaAttrModule(dep.module, mappings)
+        val excludes = dep.exclude.toVector.sortBy(_.toString).map(simpleModule(_, mappings))
+        '{
+          DependencyLike[ScalaNameAttributes, NameAttributes](
+            $module0,
+            ${mappings.Expr(dep.version)},
+            CovariantSet(${Varargs(excludes)}: _*),
+            ${mappings.mapStringStringOption(dep.userParams)}
+          )
+        }
     }
   }
 
@@ -86,8 +191,8 @@ object Extensions {
 
 trait Extensions {
   extension (inline sc: StringContext)
-    inline def mod(inline args: Any*): ModuleLike[NameAttributes] =
+    transparent inline def mod(inline args: Any*): ModuleLike[NameAttributes] =
       ${Extensions.parseModule('sc, 'args)}
-    inline def dep(inline args: Any*): DependencyLike[NameAttributes, NameAttributes] =
+    transparent inline def dep(inline args: Any*): DependencyLike[NameAttributes, NameAttributes] =
       ${Extensions.parseDependency('sc, 'args)}
 }

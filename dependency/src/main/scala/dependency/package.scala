@@ -39,7 +39,7 @@ package object dependency extends dependency.literal.Extensions {
     def apply(
       module: Module,
       version: String,
-      exclude: Set[Module],
+      exclude: CovariantSet[Module],
       userParams: Map[String, Option[String]]
     ): Dependency =
       DependencyLike(
@@ -52,7 +52,7 @@ package object dependency extends dependency.literal.Extensions {
     def apply(
       module: Module,
       version: String,
-      exclude: Set[Module]
+      exclude: CovariantSet[Module]
     ): Dependency =
       DependencyLike(
         module,
@@ -68,7 +68,7 @@ package object dependency extends dependency.literal.Extensions {
       DependencyLike(
         module,
         version,
-        Set(),
+        CovariantSet(),
         Map()
       )
 
@@ -80,7 +80,7 @@ package object dependency extends dependency.literal.Extensions {
       DependencyLike(
         Module(organization, name),
         version,
-        Set(),
+        CovariantSet(),
         Map()
       )
   }
@@ -153,7 +153,7 @@ package object dependency extends dependency.literal.Extensions {
     def apply(
       module: ScalaModule,
       version: String,
-      exclude: Set[AnyModule],
+      exclude: CovariantSet[AnyModule],
       userParams: Map[String, Option[String]]
     ): ScalaDependency =
       DependencyLike(
@@ -166,7 +166,7 @@ package object dependency extends dependency.literal.Extensions {
     def apply(
       module: ScalaModule,
       version: String,
-      exclude: Set[AnyModule]
+      exclude: CovariantSet[AnyModule]
     ): ScalaDependency =
       DependencyLike(
         module,
@@ -182,7 +182,7 @@ package object dependency extends dependency.literal.Extensions {
       DependencyLike(
         module,
         version,
-        Set(),
+        CovariantSet(),
         Map()
       )
 
@@ -194,7 +194,7 @@ package object dependency extends dependency.literal.Extensions {
       DependencyLike(
         ScalaModule(organization, name),
         version,
-        Set(),
+        CovariantSet(),
         Map()
       )
   }

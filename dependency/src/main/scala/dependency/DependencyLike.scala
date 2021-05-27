@@ -1,9 +1,9 @@
 package dependency
 
-final case class DependencyLike[+A <: NameAttributes, E <: NameAttributes](
+final case class DependencyLike[+A <: NameAttributes, +E <: NameAttributes](
   module: ModuleLike[A],
   version: String,
-  exclude: Set[ModuleLike[E]],
+  exclude: CovariantSet[ModuleLike[E]],
   userParams: Map[String, Option[String]]
 ) {
   def applyParams(params: ScalaParameters): Dependency =
@@ -43,7 +43,7 @@ object DependencyLike {
   def apply[A <: NameAttributes, E <: NameAttributes](
     module: ModuleLike[A],
     version: String,
-    exclude: Set[ModuleLike[E]]
+    exclude: CovariantSet[ModuleLike[E]]
   ): DependencyLike[A, E] =
     DependencyLike[A, E](
       module,
@@ -59,7 +59,7 @@ object DependencyLike {
     DependencyLike[A, NameAttributes](
       module,
       version,
-      Set.empty[AnyModule],
+      CovariantSet.empty[AnyModule],
       Map.empty[String, Option[String]]
     )
 }
