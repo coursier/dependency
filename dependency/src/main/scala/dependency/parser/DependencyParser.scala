@@ -26,11 +26,11 @@ object DependencyParser {
         val maybeExclusions = excludeParams
           .iterator
           .map(_.stripPrefix("exclude="))
-          .foldLeft[Either[String, Set[AnyModule]]](Right(Set())) { (eitherAcc, input) =>
+          .foldLeft[Either[String, CovariantSet[AnyModule]]](Right(CovariantSet())) { (eitherAcc, input) =>
             for {
               acc <- eitherAcc
               elem <- parseExclude(input)
-            } yield acc + elem
+            } yield acc += elem
           }
 
         for {

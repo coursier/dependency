@@ -72,7 +72,7 @@ class LiteralTests extends munit.FunSuite {
     val exclName = "ba"
     val dep = dep"org:name:1.2,exclude=fu%$exclName"
     val expected = Dependency("org", "name", "1.2").copy(
-      exclude = Set(Module("fu", "ba"))
+      exclude = CovariantSet(Module("fu", "ba"))
     )
   }
 

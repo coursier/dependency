@@ -47,7 +47,7 @@ object Extensions {
       DependencyLike(
         ${module(dep.module, mappings)},
         ${mappings.Expr(dep.version)},
-        Set(${Varargs(excludes)}: _*),
+        CovariantSet(${Varargs(excludes)}: _*),
         ${mappings.mapStringStringOption(dep.userParams)}
       )
     }

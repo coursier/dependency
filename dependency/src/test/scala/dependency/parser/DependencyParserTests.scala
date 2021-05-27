@@ -49,19 +49,19 @@ class DependencyParserTests extends munit.FunSuite {
 
   test("exclude") {
     val res = DependencyParser.parse("org:name:1.2,exclude=fu%ba")
-    val expected = Right(Dependency("org", "name", "1.2").copy(exclude = Set(Module("fu", "ba"))))
+    val expected = Right(Dependency("org", "name", "1.2").copy(exclude = CovariantSet(Module("fu", "ba"))))
     expect(res == expected)
   }
 
   test("scala exclude") {
     val res = DependencyParser.parse("org:name:1.2,exclude=fu%%ba")
-    val expected = Right(Dependency("org", "name", "1.2").copy(exclude = Set(ScalaModule("fu", "ba"))))
+    val expected = Right(Dependency("org", "name", "1.2").copy(exclude = CovariantSet(ScalaModule("fu", "ba"))))
     expect(res == expected)
   }
 
   test("several exclude") {
     val res = DependencyParser.parse("org:name:1.2,exclude=fu%ba,exclude=aa%%aa-1")
-    val expected = Right(Dependency("org", "name", "1.2").copy(exclude = Set(Module("fu", "ba"), ScalaModule("aa", "aa-1"))))
+    val expected = Right(Dependency("org", "name", "1.2").copy(exclude = CovariantSet(Module("fu", "ba"), ScalaModule("aa", "aa-1"))))
     expect(res == expected)
   }
 
@@ -82,7 +82,7 @@ class DependencyParserTests extends munit.FunSuite {
     val expected = Right(
       ScalaDependency(ScalaModule("org", "name", fullCrossVersion = true, platform = true), "1.2")
         .copy(
-          exclude = Set(
+          exclude = CovariantSet(
             Module("foo", "*"),
             ScalaModule("comp", "*")
           ),

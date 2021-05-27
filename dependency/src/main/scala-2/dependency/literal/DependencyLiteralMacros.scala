@@ -32,7 +32,7 @@ class DependencyLiteralMacros(override val c: blackbox.Context) extends ModuleLi
       _root_.dependency.DependencyLike[$nameAttr, _root_.dependency.NameAttributes](
         $modExpr,
         ${applyMappings(dep.version, mappings)},
-        _root_.scala.collection.immutable.Set[_root_.dependency.AnyModule](..$exclude),
+        _root_.dependency.CovariantSet[_root_.dependency.AnyModule](..$exclude),
         $params
       )
     """)
