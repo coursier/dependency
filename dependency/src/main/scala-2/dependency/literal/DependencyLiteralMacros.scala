@@ -1,10 +1,10 @@
 package dependency
 package literal
 
-import scala.reflect.macros.blackbox
+import scala.reflect.macros.whitebox
 import dependency.parser.DependencyParser
 
-class DependencyLiteralMacros(override val c: blackbox.Context) extends ModuleLiteralMacros(c) {
+class DependencyLiteralMacros(override val c: whitebox.Context) extends ModuleLiteralMacros(c) {
   import c.universe._
 
   private def optionString(opt: Option[String], mappings: Mappings): c.Expr[Option[String]] = {
@@ -24,21 +24,25 @@ class DependencyLiteralMacros(override val c: blackbox.Context) extends ModuleLi
     c.Expr(q"_root_.scala.collection.immutable.Map[_root_.java.lang.String, _root_.scala.Option[_root_.java.lang.String]](..$entries)")
   }
 
-  private def dependencyExpr(dep: AnyDependency, mappings: Mappings): c.Expr[AnyDependency] = {
+  private def dependencyExpr(dep: AnyDependency, mappings: Mappings): c.Tree = {
     val (nameAttr, modExpr) = moduleExpr(dep.module, mappings)
     val params = stringOptionStringMap(dep.userParams, mappings)
     val exclude = dep.exclude.map(moduleExpr(_, mappings)._2)
-    c.Expr(q"""
-      _root_.dependency.DependencyLike[$nameAttr, _root_.dependency.NameAttributes](
+    val excludeTpe =
+      if (dep.exclude.forall(_.nameAttributes == NoAttributes)) tq"_root_.dependency.NoAttributes.type"
+      else if (dep.exclude.forall(_.nameAttributes.isInstanceOf[ScalaNameAttributes])) tq"_root_.dependency.ScalaNameAttributes"
+      else tq"_root_.dependency.NameAttributes"
+    q"""
+      _root_.dependency.DependencyLike[$nameAttr, $excludeTpe](
         $modExpr,
         ${applyMappings(dep.version, mappings)},
-        _root_.dependency.CovariantSet[_root_.dependency.AnyModule](..$exclude),
+        _root_.dependency.CovariantSet[_root_.dependency.ModuleLike[$excludeTpe]](..${exclude.toSeq}),
         $params
       )
-    """)
+    """
   }
 
-  def dependency(args: c.Expr[Any]*): c.Expr[AnyDependency] = {
+  def dependency(args: c.Tree*): c.Tree = {
     val inputs = unsafeGetPrefixStrings()
     val mappings0 = mappings(args)
     val input0 = input(inputs, mappings0)

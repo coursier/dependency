@@ -3,9 +3,9 @@ package dependency.literal
 import java.util.UUID
 
 import scala.language.experimental.macros
-import scala.reflect.macros.blackbox
+import scala.reflect.macros.whitebox
 
-abstract class LiteralMacros(val c: blackbox.Context) {
+abstract class LiteralMacros(val c: whitebox.Context) {
   import c.universe._
 
   protected def unsafeGetPrefixString(): String =
@@ -39,7 +39,7 @@ abstract class LiteralMacros(val c: blackbox.Context) {
     helper(0)
   }
 
-  private def insertExpr(str: String, idLen: Int, insert: c.Expr[Any], indices: List[Int]): c.Tree =
+  private def insertExpr(str: String, idLen: Int, insert: c.Tree, indices: List[Int]): c.Tree =
     indices match {
       case Nil => q"$str"
       case idx :: tail =>
@@ -48,7 +48,7 @@ abstract class LiteralMacros(val c: blackbox.Context) {
         q"$prefixExpr + $insert + ${suffix.substring(idLen)}"
     }
 
-  protected final type Mappings = Seq[(String, c.Expr[Any])]
+  protected final type Mappings = Seq[(String, c.Tree)]
 
   protected def applyMappings(str: String, mappings: Mappings): c.Expr[String] = {
     val matchOpt = mappings
@@ -69,7 +69,7 @@ abstract class LiteralMacros(val c: blackbox.Context) {
     }
   }
 
-  def mappings(args: Seq[c.Expr[Any]]): Mappings =
+  def mappings(args: Seq[c.Tree]): Mappings =
     args.map(arg => (UUID.randomUUID().toString.filter(_ != '-'), arg))
   def input(inputs: Seq[String], mappings: Mappings): String =
     (inputs.zip(mappings).flatMap { case (s, (id, _)) => Seq(s, id) } ++ inputs.drop(mappings.length)).mkString
