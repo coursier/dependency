@@ -10,6 +10,8 @@ class CovariantSet[+A] private (private val elements: List[A])
   with IterableOps[A, CovariantSet, CovariantSet[A]]
   with IterableFactoryDefaults[A, CovariantSet] {
 
+  protected[this] override def className: String = "CovariantSet"
+
   def +=[B >: A](elem: B): CovariantSet[B] =
     if (elements.contains(elem))
       this
