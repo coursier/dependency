@@ -36,7 +36,7 @@ class CovariantSet[+A] private (private val elements: List[A])
 
 object CovariantSet extends IterableFactory[CovariantSet] {
   def from[A](source: IterableOnce[A]): CovariantSet[A] =
-    new CovariantSet[A](source.toList.distinct)
+    new CovariantSet[A](source.iterator.toList.distinct)
   def empty[A]: CovariantSet[A] =
     new CovariantSet[A](Nil)
   def newBuilder[A]: Builder[A, CovariantSet[A]] =
