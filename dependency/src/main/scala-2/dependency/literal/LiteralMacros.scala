@@ -39,34 +39,30 @@ abstract class LiteralMacros(val c: whitebox.Context) {
     helper(0)
   }
 
-  private def insertExpr(str: String, idLen: Int, insert: c.Tree, indices: List[Int]): c.Tree =
+  private def insertExpr(str: String, indices: List[(Int, Int, c.Expr[Any])]): c.Tree =
     indices match {
       case Nil => q"$str"
-      case idx :: tail =>
+      case (idx, idLen, insert) :: tail =>
         val (prefix, suffix) = str.splitAt(idx)
-        val prefixExpr = insertExpr(prefix, idLen, insert, tail)
+        val prefixExpr = insertExpr(prefix, tail)
         q"$prefixExpr + $insert + ${suffix.substring(idLen)}"
     }
 
   protected final type Mappings = Seq[(String, c.Tree)]
 
   protected def applyMappings(str: String, mappings: Mappings): c.Expr[String] = {
-    val matchOpt = mappings
+    val substitutions = mappings
       .iterator
       .zipWithIndex
-      .map {
+      .flatMap {
         case ((id, expr), i) =>
-          val idx = str.indexOf(id)
-          (id, expr, i, idx)
+          val indices0 = indices(str, id)
+          indices0.map(idx => (idx, id.length, c.Expr(expr)))
       }
-      .find(_._4 >= 0)
-    matchOpt match {
-      case None => c.Expr(q"$str")
-      case Some((id, expr, i, idx)) =>
-        val indices0 = indices(str, id)
-        val tree = insertExpr(str, id.length, expr, indices0.reverse)
-        c.Expr(tree)
-    }
+      .toList
+      .sortBy(-_._1)
+    val tree = insertExpr(str, substitutions)
+    c.Expr(tree)
   }
 
   def mappings(args: Seq[c.Tree]): Mappings =
