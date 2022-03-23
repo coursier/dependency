@@ -30,9 +30,8 @@ private[literal] final case class Mappings(mappings: List[(String, QExpr[String]
     }
 
   def Expr(str: String)(using Quotes): QExpr[String] =
-    mappings match {
-      case Nil => QExpr(str)
-      case (id, expr) :: tail =>
+    mappings.find(e => str.contains(e._1)).fold(QExpr(str)){
+      case (id, expr) =>
         val indices0 = indices(str, id)
         insertExpr(str, id.length, expr, indices0)
     }
