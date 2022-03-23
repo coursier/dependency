@@ -20,21 +20,28 @@ private[literal] final case class Mappings(mappings: List[(String, QExpr[String]
     helper(0)
   }
 
-  private def insertExpr(str: String, idLen: Int, insert: QExpr[String], indices: List[Int])(using Quotes): QExpr[String] =
-    indices match {
+  private def insertExpr(str: String, substitutions: List[(Int, Int, QExpr[String])])(using Quotes): QExpr[String] =
+    substitutions match {
       case Nil => QExpr(str)
-      case idx :: tail =>
+      case (idx, idLen, insert) :: tail =>
         val (prefix, suffix) = str.splitAt(idx)
-        val prefixExpr = insertExpr(prefix, idLen, insert, tail)
+        val prefixExpr = insertExpr(prefix, tail)
         '{$prefixExpr + $insert + ${QExpr(suffix.substring(idLen))}}
     }
 
-  def Expr(str: String)(using Quotes): QExpr[String] =
-    mappings.find(e => str.contains(e._1)).fold(QExpr(str)){
-      case (id, expr) =>
-        val indices0 = indices(str, id)
-        insertExpr(str, id.length, expr, indices0)
-    }
+  def Expr(str: String)(using Quotes): QExpr[String] = {
+
+    val substitutions = mappings
+      .flatMap {
+        case (id, expr) =>
+          val indices0 = indices(str, id)
+          System.err.println(s"indices0=$indices0")
+          indices0.map(idx => (idx, id.length, expr))
+      }
+      .sortBy(-_._1)
+
+    insertExpr(str, substitutions)
+  }
 
   def stringOption(opt: Option[String])(using Quotes): QExpr[Option[String]] =
     opt match {
