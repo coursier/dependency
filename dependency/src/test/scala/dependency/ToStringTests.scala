@@ -48,7 +48,7 @@ class ToStringTests extends munit.FunSuite {
 
   test("dependency with excludes") {
     val dep = Dependency("org", "name", "1.2").copy(
-      exclude = Set(ScalaModule("fu", "ba"), Module("aa", "*"))
+      exclude = CovariantSet(ScalaModule("fu", "ba"), Module("aa", "*"))
     )
     val str = dep.render
     val expected = "org:name:1.2,exclude=aa%*,exclude=fu%%ba"

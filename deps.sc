@@ -8,8 +8,8 @@ object Scala {
 }
 
 object Deps {
-  def expecty = ivy"com.eed3si9n.expecty::expecty:0.15.3"
-  def munit = ivy"org.scalameta::munit:0.7.26"
+  def expecty = ivy"com.eed3si9n.expecty::expecty:0.15.4"
+  def munit = ivy"org.scalameta::munit:0.7.29"
   def scalaReflect(sv: String) = ivy"org.scala-lang:scala-reflect:$sv"
 }
 
