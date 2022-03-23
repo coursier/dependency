@@ -77,12 +77,23 @@ class LiteralTests extends munit.FunSuite {
     expect(dep == expected)
   }
 
-  test("dependcy interpolation") {
+  test("dependency interpolation") {
     val org = "org.org"
     val name = "name-name"
     val version = "123-version"
     val dep = dep"$org::$name:$version"
     val expected = Dependency(org, name, version)
+    expect(dep.name == expected.name)
+    expect(dep.organization == expected.organization)
+    expect(dep.version == expected.version)
+  }
+
+  test("other dependency interpolation") {
+    val org = "org.org"
+    val name = "name"
+    val version = "123-version"
+    val dep = dep"$org::$name-$name:$version"
+    val expected = Dependency(org, s"$name-$name", version)
     expect(dep.name == expected.name)
     expect(dep.organization == expected.organization)
     expect(dep.version == expected.version)
