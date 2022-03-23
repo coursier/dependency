@@ -35,7 +35,6 @@ private[literal] final case class Mappings(mappings: List[(String, QExpr[String]
       .flatMap {
         case (id, expr) =>
           val indices0 = indices(str, id)
-          System.err.println(s"indices0=$indices0")
           indices0.map(idx => (idx, id.length, expr))
       }
       .sortBy(-_._1)
