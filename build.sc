@@ -1,25 +1,38 @@
-import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
+import $ivy.`io.chris-kipp::mill-ci-release::0.1.5`
 import $file.deps, deps.{Deps, Scala, Versions}
-import $file.settings, settings.DependencyPublishModule
 
 import java.io.File
 import mill._, scalalib._
 import scala.concurrent.duration.DurationInt
+import io.kipp.mill.ci.release.CiReleaseModule
 
 object dependency extends Cross[Dependency](Scala.all: _*)
 
-class Dependency(val crossScalaVersion: String) extends CrossSbtModule with DependencyPublishModule {
+class Dependency(val crossScalaVersion: String) extends CrossSbtModule with CiReleaseModule {
+
+  import mill.scalalib.publish._
+
+  def pomSettings = PomSettings(
+    description = artifactName(),
+    organization = "io.get-coursier",
+    url = "https://github.com/coursier/dependency",
+    licenses = Seq(License.`BSD-3-Clause`),
+    versionControl = VersionControl.github("coursier", "dependency"),
+    developers = Seq(
+      Developer("alexarchambault", "Alex Archambault","https://github.com/alexarchambault")
+    )
+  )
+
   def compileIvyDeps = T{
     val sv = scalaVersion()
     if (sv.startsWith("2.")) Agg(Deps.scalaReflect(sv))
     else Agg.empty[Dep]
   }
-  object test extends Tests {
+  object test extends Tests with TestModule.Munit {
     def ivyDeps = Agg(
       Deps.expecty,
       Deps.munit
     )
-    def testFramework = "munit.Framework"
   }
 }
 
@@ -47,19 +60,3 @@ def mdoc(args: String*) = T.command {
     stderr = os.Inherit
   )
 }
-
-def publishSonatype(tasks: mill.main.Tasks[PublishModule.PublishData]) =
-  T.command {
-    val timeout = 10.minutes
-    val credentials = sys.env("SONATYPE_USERNAME") + ":" + sys.env("SONATYPE_PASSWORD")
-    val pgpPassword = sys.env("PGP_PASSPHRASE")
-    val data = define.Task.sequence(tasks.value)()
-
-    settings.publishSonatype(
-      credentials = credentials,
-      pgpPassword = pgpPassword,
-      data = data,
-      timeout = timeout,
-      log = T.ctx().log
-    )
-  }
