@@ -1,4 +1,4 @@
-import $ivy.`io.chris-kipp::mill-ci-release::0.1.5`
+import $ivy.`io.chris-kipp::mill-ci-release::0.1.7`
 import $file.deps, deps.{Deps, Scala, Versions}
 
 import java.io.File
