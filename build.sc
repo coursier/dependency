@@ -1,15 +1,15 @@
-import $ivy.`io.chris-kipp::mill-ci-release::0.1.9`
+import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
 import $file.deps, deps.{Deps, Scala, Versions}
 
 import java.io.File
+import de.tobiasroeser.mill.vcs.version._
 import mill._, scalalib._
 import scala.concurrent.duration.DurationInt
-import io.kipp.mill.ci.release.CiReleaseModule
 
 object dependency extends Cross[Dependency](Scala.all)
 object `dependency-interface` extends Cross[DependencyInterface](Scala.all)
 
-trait DependencyPublishModule extends CiReleaseModule {
+trait DependencyPublishModule extends PublishModule {
 
   import mill.scalalib.publish._
 
@@ -24,6 +24,28 @@ trait DependencyPublishModule extends CiReleaseModule {
     )
   )
 
+  def publishVersion = T {
+    val state = VcsVersion.vcsState()
+    if (state.commitsSinceLastTag > 0) {
+      val versionOrEmpty = state.lastTag
+        .filter(_ != "latest")
+        .map(_.stripPrefix("v"))
+        .flatMap { tag =>
+          val idx = tag.lastIndexOf(".")
+          if (idx >= 0)
+            Some(tag.take(idx + 1) + (tag.drop(idx + 1).takeWhile(_.isDigit).toInt + 1).toString + "-SNAPSHOT")
+          else None
+        }
+        .getOrElse("0.0.1-SNAPSHOT")
+      Some(versionOrEmpty)
+        .filter(_.nonEmpty)
+        .getOrElse(state.format())
+    } else
+      state
+        .lastTag
+        .getOrElse(state.format())
+        .stripPrefix("v")
+  }
 }
 
 trait Dependency extends CrossSbtModule with DependencyPublishModule {
@@ -83,3 +105,54 @@ def mdoc(args: String*) = T.command {
     stderr = os.Inherit
   )
 }
+
+def publishSonatype(tasks: mill.main.Tasks[PublishModule.PublishData]) =
+  T.command {
+    import scala.concurrent.duration._
+
+    val data = T.sequence(tasks.value)()
+    val log  = T.ctx().log
+
+    val credentials = sys.env("SONATYPE_USERNAME") + ":" + sys.env("SONATYPE_PASSWORD")
+    val pgpPassword = sys.env("PGP_PASSPHRASE")
+    val timeout     = 10.minutes
+
+    val artifacts = data.map {
+      case PublishModule.PublishData(a, s) =>
+        (s.map { case (p, f) => (p.path, f) }, a)
+    }
+
+    val isRelease = {
+      val versions = artifacts.map(_._2.version).toSet
+      val set      = versions.map(!_.endsWith("-SNAPSHOT"))
+      assert(
+        set.size == 1,
+        s"Found both snapshot and non-snapshot versions: ${versions.toVector.sorted.mkString(", ")}",
+      )
+      set.head
+    }
+    val publisher = new scalalib.publish.SonatypePublisher(
+      uri = "https://oss.sonatype.org/service/local",
+      snapshotUri = "https://oss.sonatype.org/content/repositories/snapshots",
+      credentials = credentials,
+      signed = true,
+      gpgArgs = Seq(
+        "--detach-sign",
+        "--batch=true",
+        "--yes",
+        "--pinentry-mode",
+        "loopback",
+        "--passphrase",
+        pgpPassword,
+        "--armor",
+        "--use-agent",
+      ),
+      readTimeout = timeout.toMillis.toInt,
+      connectTimeout = timeout.toMillis.toInt,
+      log = log,
+      awaitTimeout = timeout.toMillis.toInt,
+      stagingRelease = isRelease,
+    )
+
+    publisher.publishAll(isRelease, artifacts: _*)
+  }
