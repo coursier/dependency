@@ -6,9 +6,9 @@ import mill._, scalalib._
 import scala.concurrent.duration.DurationInt
 import io.kipp.mill.ci.release.CiReleaseModule
 
-object dependency extends Cross[Dependency](Scala.all: _*)
+object dependency extends Cross[Dependency](Scala.all)
 
-class Dependency(val crossScalaVersion: String) extends CrossSbtModule with CiReleaseModule {
+trait Dependency extends CrossSbtModule with CiReleaseModule {
 
   import mill.scalalib.publish._
 
