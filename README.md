@@ -148,6 +148,34 @@ assert(ScalaVersion.jsBinary("1.5.1") == Some("1"))
 assert(ScalaVersion.nativeBinary("0.4.0") == Some("0.4"))
 ```
 
+### Conversions
+
+#### To coursier interface dependency
+
+Add a dependency towards `io.get-coursier::dependency-interface`:
+
+Add `io.get-coursier::dependency-interface:0.2.3` to your build:
+```scala
+// sbt
+libraryDependencies += "io.get-coursier" %% "dependency-interface" % "0.2.3"
+// mill
+def ivyDeps = Agg(ivy"io.get-coursier::dependency-interface:0.2.3")
+```
+
+Then do
+```scala
+import dependency.api.ApiConverter
+ApiConverter.module(mod"io.get-coursier::coursier") // coursierapi.Module
+ApiConverter.dependency(dep"io.get-coursier::coursier:2.0.6".applyParams(ScalaParameters("2.13.6"))) // coursierapi.Dependency
+```
+
+Alternatively, the dependency-interface module also provides implicit conversions for these:
+```scala
+import dependency.api.ops._
+mod"io.get-coursier::coursier".toCs // coursierapi.Module
+dep"io.get-coursier::coursier:2.0.6".applyParams(ScalaParameters("2.13.6")).toCs // coursierapi.Dependency
+```
+
 ## License
 
 Licensed under the Apache 2.0 license.
