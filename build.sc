@@ -7,8 +7,9 @@ import scala.concurrent.duration.DurationInt
 import io.kipp.mill.ci.release.CiReleaseModule
 
 object dependency extends Cross[Dependency](Scala.all)
+object `dependency-interface` extends Cross[DependencyInterface](Scala.all)
 
-trait Dependency extends CrossSbtModule with CiReleaseModule {
+trait DependencyPublishModule extends CiReleaseModule {
 
   import mill.scalalib.publish._
 
@@ -23,11 +24,33 @@ trait Dependency extends CrossSbtModule with CiReleaseModule {
     )
   )
 
+}
+
+trait Dependency extends CrossSbtModule with DependencyPublishModule {
+
   def compileIvyDeps = T{
     val sv = scalaVersion()
     if (sv.startsWith("2.")) Agg(Deps.scalaReflect(sv))
     else Agg.empty[Dep]
   }
+  object test extends Tests with TestModule.Munit {
+    def ivyDeps = Agg(
+      Deps.expecty,
+      Deps.munit
+    )
+  }
+}
+
+
+trait DependencyInterface extends CrossSbtModule with DependencyPublishModule {
+
+  def moduleDeps = super.moduleDeps ++ Seq(
+    dependency()
+  )
+
+  def ivyDeps = super.ivyDeps() ++ Agg(
+    Deps.interface
+  )
   object test extends Tests with TestModule.Munit {
     def ivyDeps = Agg(
       Deps.expecty,
