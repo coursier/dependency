@@ -14,12 +14,12 @@
 
 ## Usage
 
-Add `io.get-coursier::dependency:0.1.0` to your build:
+Add `io.get-coursier::dependency:0.2.2` to your build:
 ```scala
 // sbt
-libraryDependencies += "io.get-coursier" %% "dependency" % "0.1.0"
+libraryDependencies += "io.get-coursier" %% "dependency" % "0.2.2"
 // mill
-def ivyDeps = Agg(ivy"io.get-coursier::dependency:0.1.0")
+def ivyDeps = Agg(ivy"io.get-coursier::dependency:0.2.2")
 ```
 
 The latest version is [![Maven Central](https://img.shields.io/maven-central/v/io.get-coursier/dependency_3.svg)](https://maven-badges.herokuapp.com/maven-central/io.get-coursier/dependency_3).
