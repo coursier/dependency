@@ -52,6 +52,15 @@ val javaDep: Dependency = dep.applyParams(params)
 assert(javaDep.toString == "io.get-coursier:coursier_2.13:2.0.6")
 ```
 
+#### Converting to pure Java dependency with a platform
+
+```scala mdoc
+val params = ScalaParameters("2.13.6").copy(platform = Some("myplatform2"))
+val javaDep: Dependency = dep"io.get-coursier::coursier::2.0.6".applyParams(params)
+
+assert(javaDep.toString == "io.get-coursier:coursier_myplatform2_2.13:2.0.6")
+```
+
 #### String interpolator
 
 ```scala mdoc
