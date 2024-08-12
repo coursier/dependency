@@ -16,7 +16,7 @@ jobs:
         fetch-depth: 0
         submodules: true
     - uses: coursier/cache-action@v6
-    - uses: laughedelic/coursier-setup@v1
+    - uses: coursier/setup-action@v1
       with:
         jvm: 8
     - name: Test
@@ -33,7 +33,7 @@ jobs:
         fetch-depth: 0
         submodules: true
     - uses: coursier/cache-action@v6
-    - uses: laughedelic/coursier-setup@v1
+    - uses: coursier/setup-action@v1
       with:
         jvm: 8
     - run: .github/scripts/gpg-setup.sh
