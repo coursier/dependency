@@ -3,7 +3,7 @@ import mill._, scalalib._
 object Scala {
   def scala212 = "2.12.19"
   def scala213 = "2.13.15"
-  def scala3 = "3.3.3"
+  def scala3 = "3.3.4"
   def all = Seq(scala212, scala213, scala3)
 }
 
