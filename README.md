@@ -14,12 +14,12 @@
 
 ## Usage
 
-Add `io.get-coursier::dependency:0.2.3` to your build:
+Add `io.get-coursier::dependency::0.2.5` to your build:
 ```scala
 // sbt
-libraryDependencies += "io.get-coursier" %% "dependency" % "0.2.3"
+libraryDependencies += "io.get-coursier" %%% "dependency" % "0.2.5"
 // mill
-def ivyDeps = Agg(ivy"io.get-coursier::dependency:0.2.3")
+def ivyDeps = Agg(ivy"io.get-coursier::dependency::0.2.5")
 ```
 
 The latest version is [![Maven Central](https://img.shields.io/maven-central/v/io.get-coursier/dependency_3.svg)](https://maven-badges.herokuapp.com/maven-central/io.get-coursier/dependency_3).
@@ -29,7 +29,7 @@ The examples below assume `dependency._` is imported:
 import dependency._
 ```
 
-*dependency* is published for Scala 2.12, 2.13, and 3.
+*dependency* is published for Scala 2.12, 2.13, and 3, for the JVM, Scala.JS, and Scala Native.
 
 ### Dependencies
 
