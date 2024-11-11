@@ -84,7 +84,7 @@ trait DependencyInterface extends CrossSbtModule with DependencyPublishModule {
 }
 
 def readme = T.sources {
-  Seq(PathRef(os.pwd / "README.md"))
+  Seq(PathRef(T.workspace / "README.md"))
 }
 
 private def mdocScalaVersion = Scala.scala213
