@@ -1,7 +1,9 @@
+import $ivy.`com.github.lolgab::mill-mima::0.0.23`
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
 import $file.deps, deps.{Deps, Scala, Versions}
 
 import java.io.File
+import com.github.lolgab.mill.mima.Mima
 import de.tobiasroeser.mill.vcs.version._
 import mill._
 import mill.scalalib._
@@ -55,6 +57,26 @@ trait DependencyPublishModule extends PublishModule {
   }
 }
 
+trait DependencyMima extends Mima {
+  def mimaPreviousVersions: T[Seq[String]] = T.input {
+    val current = os.proc("git", "describe", "--tags", "--match", "v*")
+      .call(cwd = T.workspace)
+      .out.trim()
+    os.proc("git", "tag", "-l")
+      .call(cwd = T.workspace)
+      .out.lines()
+      .filter(_ != current)
+      .filter(_.startsWith("v"))
+      .filter(!_.contains("-"))
+      .map(_.stripPrefix("v"))
+      .filter(!_.startsWith("0.0."))
+      .filter(!_.startsWith("0.1."))
+      .map(coursier.core.Version(_))
+      .sorted
+      .map(_.repr)
+  }
+}
+
 private def scalaDirNames(sv: String): Seq[String] = {
   val split = sv.split('.')
   val major = split.head
@@ -74,7 +96,8 @@ trait Dependency extends CrossSbtModule with DependencyPublishModule {
   def scalacOptions = super.scalacOptions() ++ Seq("-release", "8")
 }
 
-trait DependencyJvm extends Dependency {
+trait DependencyJvm extends Dependency with DependencyMima {
+  def artifactName = "dependency"
   object test extends CrossSbtTests with TestModule.Munit {
     def sources = T.sources {
       super.sources() ++ scalaDirNames(scalaVersion()).map(T.workspace / "dependency" / "shared" / "src" / "test" / _).map(PathRef(_))
