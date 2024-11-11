@@ -75,6 +75,7 @@ trait Dependency extends CrossSbtModule with DependencyPublishModule {
 }
 
 trait DependencyJvm extends Dependency {
+  def artifactName = "dependency"
   object test extends CrossSbtTests with TestModule.Munit {
     def sources = T.sources {
       super.sources() ++ scalaDirNames(scalaVersion()).map(T.workspace / "dependency" / "shared" / "src" / "test" / _).map(PathRef(_))
