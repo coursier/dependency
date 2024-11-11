@@ -54,11 +54,11 @@ private[literal] final case class Mappings(mappings: List[(String, QExpr[String]
     '{Map(${Varargs(entries)}: _*)}
   }
 
-  def mapStringStringOption(map: Map[String, Option[String]])(using Quotes): QExpr[Map[String, Option[String]]] = {
-    val entries = map.toVector.sorted.map {
+  def seqStringStringOption(seq: Seq[(String, Option[String])])(using Quotes): QExpr[Seq[(String, Option[String])]] = {
+    val entries = seq.map {
       case (k, v) => '{(${Expr(k)}, ${stringOption(v)})}
     }
-    '{Map(${Varargs(entries)}: _*)}
+    '{Seq(${Varargs(entries)}: _*)}
   }
 
 }

@@ -97,7 +97,7 @@ object Extensions {
             $module0,
             ${mappings.Expr(dep.version)},
             CovariantSet(${Varargs(excludes)}: _*),
-            ${mappings.mapStringStringOption(dep.userParams)}
+            ${mappings.seqStringStringOption(dep.userParams)}
           )
         }
       case (false, true, false, true) =>
@@ -108,7 +108,7 @@ object Extensions {
             $module0,
             ${mappings.Expr(dep.version)},
             CovariantSet(${Varargs(excludes)}: _*),
-            ${mappings.mapStringStringOption(dep.userParams)}
+            ${mappings.seqStringStringOption(dep.userParams)}
           )
         }
       case (false, _, _, _) =>
@@ -119,7 +119,7 @@ object Extensions {
             $module0,
             ${mappings.Expr(dep.version)},
             CovariantSet(${Varargs(excludes)}: _*),
-            ${mappings.mapStringStringOption(dep.userParams)}
+            ${mappings.seqStringStringOption(dep.userParams)}
           )
         }
       case (true, false, _, _) | (true, true, true, _) =>
@@ -130,7 +130,7 @@ object Extensions {
             $module0,
             ${mappings.Expr(dep.version)},
             CovariantSet(${Varargs(excludes)}: _*),
-            ${mappings.mapStringStringOption(dep.userParams)}
+            ${mappings.seqStringStringOption(dep.userParams)}
           )
         }
       case (true, true, false, true) =>
@@ -141,7 +141,7 @@ object Extensions {
             $module0,
             ${mappings.Expr(dep.version)},
             CovariantSet(${Varargs(excludes)}: _*),
-            ${mappings.mapStringStringOption(dep.userParams)}
+            ${mappings.seqStringStringOption(dep.userParams)}
           )
         }
       case (true, _, _, _) =>
@@ -152,7 +152,7 @@ object Extensions {
             $module0,
             ${mappings.Expr(dep.version)},
             CovariantSet(${Varargs(excludes)}: _*),
-            ${mappings.mapStringStringOption(dep.userParams)}
+            ${mappings.seqStringStringOption(dep.userParams)}
           )
         }
     }

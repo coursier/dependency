@@ -67,13 +67,25 @@ class DependencyParserTests extends munit.FunSuite {
 
   test("param") {
     val res = DependencyParser.parse("org:name:1.2,something=ba")
-    val expected = Right(Dependency("org", "name", "1.2").copy(userParams = Map("something" -> Some("ba"))))
+    val expected = Right(Dependency("org", "name", "1.2").copy(userParams = Seq("something" -> Some("ba"))))
     expect(res == expected)
   }
 
   test("no-value param") {
     val res = DependencyParser.parse("org:name:1.2,something")
-    val expected = Right(Dependency("org", "name", "1.2").copy(userParams = Map("something" -> None)))
+    val expected = Right(Dependency("org", "name", "1.2").copy(userParams = Seq("something" -> None)))
+    expect(res == expected)
+  }
+
+  test("multiple same key params") {
+    val res = DependencyParser.parse("org:name:1.2,something=a,something,something=b")
+    val expected = Right(Dependency("org", "name", "1.2").copy(
+      userParams = Seq(
+        "something" -> Some("a"),
+        "something" -> None,
+        "something" -> Some("b")
+      )
+    ))
     expect(res == expected)
   }
 
@@ -86,7 +98,7 @@ class DependencyParserTests extends munit.FunSuite {
             Module("foo", "*"),
             ScalaModule("comp", "*")
           ),
-          userParams = Map(
+          userParams = Seq(
             "intransitive" -> None,
             "url" -> Some("aaaa")
           )
@@ -99,7 +111,7 @@ class DependencyParserTests extends munit.FunSuite {
     val res = DependencyParser.parse("org:name:1.2:runtime")
     val expected = Right(
       Dependency("org", "name", "1.2").copy(
-        userParams = Map(
+        userParams = Seq(
           "$inlineConfiguration" -> Some("runtime")
         )
       )
@@ -110,9 +122,9 @@ class DependencyParserTests extends munit.FunSuite {
     val res = DependencyParser.parse("org:name:1.2:runtime,something=ba")
     val expected = Right(
       Dependency("org", "name", "1.2").copy(
-        userParams = Map(
-          "$inlineConfiguration" -> Some("runtime"),
-          "something" -> Some("ba")
+        userParams = Seq(
+          "something" -> Some("ba"),
+          "$inlineConfiguration" -> Some("runtime")
         )
       )
     )

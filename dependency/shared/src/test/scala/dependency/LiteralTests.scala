@@ -99,4 +99,8 @@ class LiteralTests extends munit.FunSuite {
     expect(dep.version == expected.version)
   }
 
+  test("params order") {
+    val depWithParams = dep"io.get-coursier::coursier:2.0.6,url=https://dl.cs/cs.jar,intransitive"
+    assert(depWithParams.userParams == Seq("url" -> Some("https://dl.cs/cs.jar"), "intransitive" -> None))
+  }
 }

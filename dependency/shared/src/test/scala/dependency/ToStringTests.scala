@@ -57,7 +57,7 @@ class ToStringTests extends munit.FunSuite {
 
   test("dependency with params") {
     val dep = Dependency("org", "name", "1.2").copy(
-      userParams = Map(
+      userParams = Seq(
         "intransitive" -> None,
         "aa" -> Some("bb")
       )
