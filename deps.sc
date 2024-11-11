@@ -11,10 +11,12 @@ object Deps {
   def expecty = ivy"com.eed3si9n.expecty::expecty::0.16.0"
   def interface = ivy"io.get-coursier:interface:1.0.23"
   def munit = ivy"org.scalameta::munit::1.0.2"
+  def munitForNative04 = ivy"org.scalameta::munit::1.0.0"
   def scalaReflect(sv: String) = ivy"org.scala-lang:scala-reflect:$sv"
 }
 
 object Versions {
   def mdoc = "2.3.6"
   def scalaJs = "1.16.0"
+  def scalaNative = "0.4.17"
 }

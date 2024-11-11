@@ -6,11 +6,13 @@ import de.tobiasroeser.mill.vcs.version._
 import mill._
 import mill.scalalib._
 import mill.scalajslib._
+import mill.scalanativelib._
 import scala.concurrent.duration.DurationInt
 
 object dependency extends Module {
   object jvm extends Cross[DependencyJvm](Scala.all)
   object js extends Cross[DependencyJs](Scala.all)
+  object native extends Cross[DependencyNative](Scala.all)
 }
 object `dependency-interface` extends Cross[DependencyInterface](Scala.all)
 
@@ -93,6 +95,19 @@ trait DependencyJs extends Dependency with ScalaJSModule {
     def ivyDeps = Agg(
       Deps.expecty,
       Deps.munit
+    )
+  }
+}
+
+trait DependencyNative extends Dependency with ScalaNativeModule {
+  def scalaNativeVersion = Versions.scalaNative
+  object test extends CrossSbtTests with ScalaNativeTests with TestModule.Munit {
+    def sources = T.sources {
+      super.sources() ++ scalaDirNames(scalaVersion()).map(T.workspace / "dependency" / "shared" / "src" / "test" / _).map(PathRef(_))
+    }
+    def ivyDeps = Agg(
+      Deps.expecty,
+      Deps.munitForNative04
     )
   }
 }
