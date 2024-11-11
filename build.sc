@@ -55,7 +55,8 @@ trait Dependency extends CrossSbtModule with DependencyPublishModule {
     if (sv.startsWith("2.")) Agg(Deps.scalaReflect(sv))
     else Agg.empty[Dep]
   }
-  object test extends Tests with TestModule.Munit {
+  def scalacOptions = super.scalacOptions() ++ Seq("-release", "8")
+  object test extends CrossSbtTests with TestModule.Munit {
     def ivyDeps = Agg(
       Deps.expecty,
       Deps.munit
@@ -73,7 +74,8 @@ trait DependencyInterface extends CrossSbtModule with DependencyPublishModule {
   def ivyDeps = super.ivyDeps() ++ Agg(
     Deps.interface
   )
-  object test extends Tests with TestModule.Munit {
+  def scalacOptions = super.scalacOptions() ++ Seq("-release", "8")
+  object test extends CrossSbtTests with TestModule.Munit {
     def ivyDeps = Agg(
       Deps.expecty,
       Deps.munit
@@ -82,7 +84,7 @@ trait DependencyInterface extends CrossSbtModule with DependencyPublishModule {
 }
 
 def readme = T.sources {
-  Seq(PathRef(os.pwd / "README.md"))
+  Seq(PathRef(T.workspace / "README.md"))
 }
 
 private def mdocScalaVersion = Scala.scala213
@@ -100,6 +102,7 @@ def mdoc(args: String*) = T.command {
     "--classpath", cp.mkString(File.pathSeparator)
   )
   os.proc(cmd, "--", mdocArgs, args).call(
+    cwd = T.workspace,
     stdin = os.Inherit,
     stdout = os.Inherit,
     stderr = os.Inherit
@@ -150,6 +153,8 @@ def publishSonatype(tasks: mill.main.Tasks[PublishModule.PublishData]) =
       readTimeout = timeout.toMillis.toInt,
       connectTimeout = timeout.toMillis.toInt,
       log = log,
+      workspace = T.workspace,
+      env = Map.empty,
       awaitTimeout = timeout.toMillis.toInt,
       stagingRelease = isRelease,
     )

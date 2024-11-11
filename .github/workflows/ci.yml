@@ -18,11 +18,11 @@ jobs:
     - uses: coursier/cache-action@v6
     - uses: coursier/setup-action@v1
       with:
-        jvm: 8
+        jvm: 17
     - name: Test
-      run: ./mill __.test
+      run: ./mill -i __.test
     - name: Validate README
-      run: ./mill mdoc
+      run: ./mill -i mdoc
 
   publish:
     if: github.event_name == 'push'
@@ -35,12 +35,12 @@ jobs:
     - uses: coursier/cache-action@v6
     - uses: coursier/setup-action@v1
       with:
-        jvm: 8
+        jvm: 17
     - run: .github/scripts/gpg-setup.sh
       env:
         PGP_SECRET: ${{ secrets.PUBLISH_SECRET_KEY }}
     - name: Release
-      run: ./mill publishSonatype __.publishArtifacts
+      run: ./mill -i publishSonatype --tasks __.publishArtifacts
       env:
         PGP_PASSPHRASE: ${{ secrets.PUBLISH_SECRET_KEY_PASSWORD }}
         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
