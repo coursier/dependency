@@ -56,7 +56,7 @@ trait Dependency extends CrossSbtModule with DependencyPublishModule {
     else Agg.empty[Dep]
   }
   def scalacOptions = super.scalacOptions() ++ Seq("-release", "8")
-  object test extends Tests with TestModule.Munit {
+  object test extends CrossSbtTests with TestModule.Munit {
     def ivyDeps = Agg(
       Deps.expecty,
       Deps.munit
@@ -75,7 +75,7 @@ trait DependencyInterface extends CrossSbtModule with DependencyPublishModule {
     Deps.interface
   )
   def scalacOptions = super.scalacOptions() ++ Seq("-release", "8")
-  object test extends Tests with TestModule.Munit {
+  object test extends CrossSbtTests with TestModule.Munit {
     def ivyDeps = Agg(
       Deps.expecty,
       Deps.munit
