@@ -53,8 +53,14 @@ jobs:
     - run: .github/scripts/gpg-setup.sh
       env:
         PGP_SECRET: ${{ secrets.PUBLISH_SECRET_KEY }}
-    - name: Release
-      run: ./mill -i publishSonatype --tasks __.publishArtifacts
+    - name: Release JS
+      run: ./mill -i publishSonatype --tasks 'dependency.js[_].publishArtifacts'
+      env:
+        PGP_PASSPHRASE: ${{ secrets.PUBLISH_SECRET_KEY_PASSWORD }}
+        SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+        SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+    - name: Release Native
+      run: ./mill -i publishSonatype --tasks 'dependency.native[_].publishArtifacts'
       env:
         PGP_PASSPHRASE: ${{ secrets.PUBLISH_SECRET_KEY_PASSWORD }}
         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
