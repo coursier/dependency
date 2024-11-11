@@ -153,6 +153,8 @@ def publishSonatype(tasks: mill.main.Tasks[PublishModule.PublishData]) =
       readTimeout = timeout.toMillis.toInt,
       connectTimeout = timeout.toMillis.toInt,
       log = log,
+      workspace = T.workspace,
+      env = Map.empty,
       awaitTimeout = timeout.toMillis.toInt,
       stagingRelease = isRelease,
     )
