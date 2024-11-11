@@ -3,10 +3,17 @@ import $file.deps, deps.{Deps, Scala, Versions}
 
 import java.io.File
 import de.tobiasroeser.mill.vcs.version._
-import mill._, scalalib._
+import mill._
+import mill.scalalib._
+import mill.scalajslib._
+import mill.scalanativelib._
 import scala.concurrent.duration.DurationInt
 
-object dependency extends Cross[Dependency](Scala.all)
+object dependency extends Module {
+  object jvm extends Cross[DependencyJvm](Scala.all)
+  object js extends Cross[DependencyJs](Scala.all)
+  object native extends Cross[DependencyNative](Scala.all)
+}
 object `dependency-interface` extends Cross[DependencyInterface](Scala.all)
 
 trait DependencyPublishModule extends PublishModule {
@@ -48,18 +55,59 @@ trait DependencyPublishModule extends PublishModule {
   }
 }
 
-trait Dependency extends CrossSbtModule with DependencyPublishModule {
+private def scalaDirNames(sv: String): Seq[String] = {
+  val split = sv.split('.')
+  val major = split.head
+  val sbv = split.take(2).mkString(".")
+  Seq("scala", s"scala-$major", s"scala-$sbv", s"scala-$sv")
+}
 
+trait Dependency extends CrossSbtModule with DependencyPublishModule {
+  def sources = T.sources {
+    super.sources() ++ scalaDirNames(scalaVersion()).map(T.workspace / "dependency" / "shared" / "src" / "main" / _).map(PathRef(_))
+  }
   def compileIvyDeps = T{
     val sv = scalaVersion()
     if (sv.startsWith("2.")) Agg(Deps.scalaReflect(sv))
     else Agg.empty[Dep]
   }
   def scalacOptions = super.scalacOptions() ++ Seq("-release", "8")
+}
+
+trait DependencyJvm extends Dependency {
   object test extends CrossSbtTests with TestModule.Munit {
+    def sources = T.sources {
+      super.sources() ++ scalaDirNames(scalaVersion()).map(T.workspace / "dependency" / "shared" / "src" / "test" / _).map(PathRef(_))
+    }
     def ivyDeps = Agg(
       Deps.expecty,
       Deps.munit
+    )
+  }
+}
+
+trait DependencyJs extends Dependency with ScalaJSModule {
+  def scalaJSVersion = Versions.scalaJs
+  object test extends CrossSbtTests with ScalaJSTests with TestModule.Munit {
+    def sources = T.sources {
+      super.sources() ++ scalaDirNames(scalaVersion()).map(T.workspace / "dependency" / "shared" / "src" / "test" / _).map(PathRef(_))
+    }
+    def ivyDeps = Agg(
+      Deps.expecty,
+      Deps.munit
+    )
+  }
+}
+
+trait DependencyNative extends Dependency with ScalaNativeModule {
+  def scalaNativeVersion = Versions.scalaNative
+  object test extends CrossSbtTests with ScalaNativeTests with TestModule.Munit {
+    def sources = T.sources {
+      super.sources() ++ scalaDirNames(scalaVersion()).map(T.workspace / "dependency" / "shared" / "src" / "test" / _).map(PathRef(_))
+    }
+    def ivyDeps = Agg(
+      Deps.expecty,
+      Deps.munitForNative04
     )
   }
 }
@@ -68,7 +116,7 @@ trait Dependency extends CrossSbtModule with DependencyPublishModule {
 trait DependencyInterface extends CrossSbtModule with DependencyPublishModule {
 
   def moduleDeps = super.moduleDeps ++ Seq(
-    dependency()
+    dependency.jvm()
   )
 
   def ivyDeps = super.ivyDeps() ++ Agg(
@@ -91,7 +139,7 @@ private def mdocScalaVersion = Scala.scala213
 def mdoc(args: String*) = T.command {
   val readme0 = readme().head.path
   val dest = T.dest / "README.md"
-  val cp = (dependency(mdocScalaVersion).runClasspath() :+ dependency(mdocScalaVersion).jar())
+  val cp = (dependency.jvm(mdocScalaVersion).runClasspath() :+ dependency.jvm(mdocScalaVersion).jar())
     .map(_.path)
     .filter(os.exists(_))
     .filter(!os.isDir(_))
