@@ -18,7 +18,7 @@ jobs:
     - uses: coursier/cache-action@v6
     - uses: coursier/setup-action@v1
       with:
-        jvm: 8
+        jvm: 17
     - name: Test
       run: ./mill __.test
     - name: Validate README
@@ -35,7 +35,7 @@ jobs:
     - uses: coursier/cache-action@v6
     - uses: coursier/setup-action@v1
       with:
-        jvm: 8
+        jvm: 17
     - run: .github/scripts/gpg-setup.sh
       env:
         PGP_SECRET: ${{ secrets.PUBLISH_SECRET_KEY }}
