@@ -110,6 +110,7 @@ trait DependencyJvm extends Dependency with DependencyMima {
 }
 
 trait DependencyJs extends Dependency with ScalaJSModule {
+  def artifactName = "dependency"
   def scalaJSVersion = Versions.scalaJs
   object test extends CrossSbtTests with ScalaJSTests with TestModule.Munit {
     def sources = T.sources {
@@ -123,6 +124,7 @@ trait DependencyJs extends Dependency with ScalaJSModule {
 }
 
 trait DependencyNative extends Dependency with ScalaNativeModule {
+  def artifactName = "dependency"
   def scalaNativeVersion = Versions.scalaNative
   object test extends CrossSbtTests with ScalaNativeTests with TestModule.Munit {
     def sources = T.sources {
