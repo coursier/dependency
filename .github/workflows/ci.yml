@@ -24,6 +24,20 @@ jobs:
     - name: Validate README
       run: ./mill -i mdoc
 
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: true
+    - uses: coursier/cache-action@v6
+    - uses: coursier/setup-action@v1
+      with:
+        jvm: 17
+    - name: MiMA
+      run: ./mill -i __.mimaReportBinaryIssues
+
   publish:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
