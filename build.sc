@@ -102,6 +102,7 @@ def mdoc(args: String*) = T.command {
     "--classpath", cp.mkString(File.pathSeparator)
   )
   os.proc(cmd, "--", mdocArgs, args).call(
+    cwd = T.workspace,
     stdin = os.Inherit,
     stdout = os.Inherit,
     stderr = os.Inherit
