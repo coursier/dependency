@@ -7,6 +7,9 @@ final case class ModuleLike[+A <: NameAttributes](
   attributes: Map[String, String]
 ) {
 
+  ModuleLike.validateValue(organization, "organization")
+  ModuleLike.validateValue(name, "module name")
+
   def applyParams(params: ScalaParameters): Module =
     copy(
       name = name + nameAttributes.suffix(params),
@@ -21,4 +24,10 @@ final case class ModuleLike[+A <: NameAttributes](
     s"$organization$separator${nameAttributes.render(name, separator)}$attributesString"
   override def toString: String =
     render
+}
+
+object ModuleLike {
+  private[dependency] def validateValue(value: String, name: String): Unit =
+    if (value.contains("/")) throw new IllegalArgumentException(s"$name $value contains invalid '/'")
+    else if (value.contains("\\")) throw new IllegalArgumentException(s"$name $value contains invalid '\\'")
 }

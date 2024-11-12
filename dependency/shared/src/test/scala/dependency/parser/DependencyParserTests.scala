@@ -130,4 +130,29 @@ class DependencyParserTests extends munit.FunSuite {
     )
     expect(res == expected)
   }
+
+  test("reject slash in org") {
+    val res = DependencyParser.parse("o/rg::name:1.2")
+    expect(res.isLeft)
+  }
+  test("reject backslash in org") {
+    val res = DependencyParser.parse("o\\rg::name:1.2")
+    expect(res.isLeft)
+  }
+  test("reject slash in name") {
+    val res = DependencyParser.parse("org::/name:1.2")
+    expect(res.isLeft)
+  }
+  test("reject backslash in name") {
+    val res = DependencyParser.parse("org::\\name:1.2")
+    expect(res.isLeft)
+  }
+  test("reject slash in version") {
+    val res = DependencyParser.parse("org::name:1./2")
+    expect(res.isLeft)
+  }
+  test("reject backslash in version") {
+    val res = DependencyParser.parse("org::name:1.\\2")
+    expect(res.isLeft)
+  }
 }

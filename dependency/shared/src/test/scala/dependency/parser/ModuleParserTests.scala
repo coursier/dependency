@@ -92,4 +92,21 @@ class ModuleParserTests extends munit.FunSuite {
     expect(res.isLeft)
   }
 
+  test("reject slash in org") {
+    val res = ModuleParser.parse("o/rg::name")
+    expect(res.isLeft)
+  }
+  test("reject backslash in org") {
+    val res = ModuleParser.parse("o\\rg::name")
+    expect(res.isLeft)
+  }
+  test("reject slash in name") {
+    val res = ModuleParser.parse("org::/name")
+    expect(res.isLeft)
+  }
+  test("reject backslash in name") {
+    val res = ModuleParser.parse("o\\rg::\\name")
+    expect(res.isLeft)
+  }
+
 }
