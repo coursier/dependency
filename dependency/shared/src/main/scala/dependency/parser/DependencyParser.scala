@@ -18,9 +18,13 @@ object DependencyParser {
     }
 
   def parse(input: String): Either[String, AnyDependency] =
+    parse(input, acceptInlineConfiguration = true)
+
+  def parse(input: String, acceptInlineConfiguration: Boolean): Either[String, AnyDependency] =
     ModuleParser.parsePrefix(input).flatMap {
       case (module, remaining) =>
-        val (version, params) = splitRemainingPart(remaining)
+        val (version, configOpt, params) = splitRemainingPart(remaining, acceptInlineConfiguration)
+        assert(acceptInlineConfiguration || configOpt.isEmpty)
 
         val (excludeParams, remainingParams) = params.partition(_.startsWith("exclude="))
         val maybeExclusions = excludeParams
@@ -36,7 +40,7 @@ object DependencyParser {
         for {
           exclusions <- maybeExclusions
         } yield {
-          val userParams = remainingParams.iterator.map(parseParam).toMap
+          val userParams = remainingParams.iterator.map(parseParam).toMap ++ configOpt.toSeq.map("$inlineConfiguration" -> Some(_))
           DependencyLike(module, version, exclusions, userParams)
         }
     }
@@ -44,7 +48,7 @@ object DependencyParser {
   private def attrSeparator = ","
   private def argSeparator = ":"
 
-  private def splitRemainingPart(input: String): (String, Seq[String]) = {
+  private def splitRemainingPart(input: String, acceptInlineConfiguration: Boolean): (String, Option[String], Seq[String]) = {
 
     def simpleSplit(s: String): (String, Seq[String]) =
       s.split(attrSeparator) match {
@@ -58,13 +62,21 @@ object DependencyParser {
       }
       else None
 
-    splitAtOpt match {
+    val (versionPart, attrs0) = splitAtOpt match {
       case None => simpleSplit(input)
       case Some(idx) =>
         val (ver, attrsPart) = input.splitAt(idx)
         val (coordsEnd, attrs) = simpleSplit(attrsPart)
         (ver + coordsEnd, attrs)
     }
+
+    if (acceptInlineConfiguration)
+      versionPart.split(argSeparator, 2) match {
+        case Array(ver, config) => (ver, Some(config), attrs0)
+        case Array(ver) => (ver, None, attrs0)
+      }
+    else
+      (versionPart, None, attrs0)
   }
 
 }
