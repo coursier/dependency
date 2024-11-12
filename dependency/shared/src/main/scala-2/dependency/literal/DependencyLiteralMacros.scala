@@ -15,13 +15,13 @@ class DependencyLiteralMacros(override val c: whitebox.Context) extends ModuleLi
     c.Expr(expr)
   }
 
-  private def stringOptionStringMap(map: Map[String, Option[String]], mappings: Mappings): c.Expr[Map[String, Option[String]]] = {
-    val entries = map.toVector.sorted.map {
+  private def stringOptionStringMap(params: Seq[(String, Option[String])], mappings: Mappings): c.Expr[Seq[(String, Option[String])]] = {
+    val entries = params.map {
       case (k, v) =>
         val value = optionString(v, mappings)
         c.Expr(q"_root_.scala.Tuple2(${applyMappings(k, mappings)}, $value)")
     }
-    c.Expr(q"_root_.scala.collection.immutable.Map[_root_.java.lang.String, _root_.scala.Option[_root_.java.lang.String]](..$entries)")
+    c.Expr(q"_root_.scala.collection.immutable.Seq[_root_.scala.Tuple2[_root_.java.lang.String, _root_.scala.Option[_root_.java.lang.String]]](..$entries)")
   }
 
   private def dependencyExpr(dep: AnyDependency, mappings: Mappings): c.Tree = {

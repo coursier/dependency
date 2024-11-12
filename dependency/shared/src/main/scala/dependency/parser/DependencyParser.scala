@@ -40,7 +40,7 @@ object DependencyParser {
         for {
           exclusions <- maybeExclusions
         } yield {
-          val userParams = remainingParams.iterator.map(parseParam).toMap ++ configOpt.toSeq.map("$inlineConfiguration" -> Some(_))
+          val userParams = remainingParams.iterator.map(parseParam).toSeq ++ configOpt.toSeq.map("$inlineConfiguration" -> Some(_))
           DependencyLike(module, version, exclusions, userParams)
         }
     }

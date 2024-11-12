@@ -22,13 +22,13 @@ object ApiConverter {
           }
           .asJava
       }
-    val cl = dep.userParams.get("classifier").flatten
+    val cl = dep.userParamsMap.get("classifier").flatMap(_.flatMap(_.toSeq).headOption)
       .orElse(Option(dep0.getPublication).map(_.getClassifier))
       .getOrElse("")
-    val tpe = dep.userParams.get("type").flatten
+    val tpe = dep.userParamsMap.get("type").flatMap(_.flatMap(_.toSeq).headOption)
       .orElse(Option(dep0.getPublication).map(_.getType))
       .getOrElse("")
-    val ext = dep.userParams.get("ext").flatten
+    val ext = dep.userParamsMap.get("ext").flatMap(_.flatMap(_.toSeq).headOption)
       .orElse(Option(dep0.getPublication).map(_.getExtension))
       .getOrElse("")
     val pubName = Option(dep0.getPublication).map(_.getName)
@@ -39,7 +39,7 @@ object ApiConverter {
       else
         new coursierapi.Publication(pubName, tpe, ext, cl)
     )
-    for (_ <- dep.userParams.get("intransitive"))
+    for (_ <- dep.userParamsMap.get("intransitive"))
       dep0 = dep0.withTransitive(false)
     dep0
   }

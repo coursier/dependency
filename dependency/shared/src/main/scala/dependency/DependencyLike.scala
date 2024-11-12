@@ -4,7 +4,7 @@ final case class DependencyLike[+A <: NameAttributes, +E <: NameAttributes](
   module: ModuleLike[A],
   version: String,
   exclude: CovariantSet[ModuleLike[E]],
-  userParams: Map[String, Option[String]]
+  userParams: Seq[(String, Option[String])]
 ) {
   def applyParams(params: ScalaParameters): Dependency =
     DependencyLike(
@@ -19,11 +19,15 @@ final case class DependencyLike[+A <: NameAttributes, +E <: NameAttributes](
   def nameAttributes: A = module.nameAttributes
   def attributes: Map[String, String] = module.attributes
 
+  lazy val userParamsMap: Map[String, Seq[Option[String]]] = userParams
+    .groupBy(_._1)
+    .mapValues(_.map(_._2))
+    .toMap
+
   private def excludeString: String =
     exclude.toVector.map(",exclude=" + _.render("%")).sorted.mkString
   private def userParamsString: String =
     userParams
-      .toVector
       .map {
         case (k, None) => k
         case (k, Some(v)) => s"$k=$v"
@@ -49,7 +53,7 @@ object DependencyLike {
       module,
       version,
       exclude,
-      Map.empty[String, Option[String]]
+      Nil
     )
 
   def apply[A <: NameAttributes](
@@ -60,6 +64,6 @@ object DependencyLike {
       module,
       version,
       CovariantSet.empty[AnyModule],
-      Map.empty[String, Option[String]]
+      Nil
     )
 }

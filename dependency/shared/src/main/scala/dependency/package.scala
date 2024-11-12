@@ -40,7 +40,7 @@ package object dependency extends dependency.literal.Extensions {
       module: Module,
       version: String,
       exclude: CovariantSet[Module],
-      userParams: Map[String, Option[String]]
+      userParams: Seq[(String, Option[String])]
     ): Dependency =
       DependencyLike(
         module,
@@ -58,7 +58,7 @@ package object dependency extends dependency.literal.Extensions {
         module,
         version,
         exclude,
-        Map()
+        Nil
       )
 
     def apply(
@@ -69,7 +69,7 @@ package object dependency extends dependency.literal.Extensions {
         module,
         version,
         CovariantSet(),
-        Map()
+        Nil
       )
 
     def apply(
@@ -81,7 +81,7 @@ package object dependency extends dependency.literal.Extensions {
         Module(organization, name),
         version,
         CovariantSet(),
-        Map()
+        Nil
       )
   }
 
@@ -154,7 +154,7 @@ package object dependency extends dependency.literal.Extensions {
       module: ScalaModule,
       version: String,
       exclude: CovariantSet[AnyModule],
-      userParams: Map[String, Option[String]]
+      userParams: Seq[(String, Option[String])]
     ): ScalaDependency =
       DependencyLike(
         module,
@@ -172,7 +172,7 @@ package object dependency extends dependency.literal.Extensions {
         module,
         version,
         exclude,
-        Map()
+        Nil
       )
 
     def apply(
@@ -183,7 +183,7 @@ package object dependency extends dependency.literal.Extensions {
         module,
         version,
         CovariantSet(),
-        Map()
+        Nil
       )
 
     def apply(
@@ -195,7 +195,7 @@ package object dependency extends dependency.literal.Extensions {
         ScalaModule(organization, name),
         version,
         CovariantSet(),
-        Map()
+        Nil
       )
   }
 }

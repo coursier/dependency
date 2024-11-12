@@ -71,9 +71,19 @@ trait DependencyMima extends Mima {
       .map(_.stripPrefix("v"))
       .filter(!_.startsWith("0.0."))
       .filter(!_.startsWith("0.1."))
+      .filter(!_.startsWith("0.2."))
       .map(coursier.core.Version(_))
       .sorted
       .map(_.repr)
+  }
+  // Remove once 0.3.0 is out
+  def mimaPreviousArtifacts = T {
+    val versions     = mimaPreviousVersions()
+    val organization = pomSettings().organization
+    val artifactId0  = artifactId()
+    Agg.from(
+      versions.map(version => ivy"$organization:$artifactId0:$version")
+    )
   }
 }
 
