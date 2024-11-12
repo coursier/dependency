@@ -94,4 +94,28 @@ class DependencyParserTests extends munit.FunSuite {
     )
     expect(res == expected)
   }
+
+  test("inline config") {
+    val res = DependencyParser.parse("org:name:1.2:runtime")
+    val expected = Right(
+      Dependency("org", "name", "1.2").copy(
+        userParams = Map(
+          "$inlineConfiguration" -> Some("runtime")
+        )
+      )
+    )
+    expect(res == expected)
+  }
+  test("inline config with param") {
+    val res = DependencyParser.parse("org:name:1.2:runtime,something=ba")
+    val expected = Right(
+      Dependency("org", "name", "1.2").copy(
+        userParams = Map(
+          "$inlineConfiguration" -> Some("runtime"),
+          "something" -> Some("ba")
+        )
+      )
+    )
+    expect(res == expected)
+  }
 }
