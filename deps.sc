@@ -12,6 +12,8 @@ object Deps {
   def interface = ivy"io.get-coursier:interface:1.0.23"
   def munit = ivy"org.scalameta::munit::1.0.2"
   def munitForNative04 = ivy"org.scalameta::munit::1.0.0"
+  def pprint = ivy"com.lihaoyi::pprint::0.9.0"
+  def pprintForNative04 = ivy"com.lihaoyi::pprint::0.8.1"
   def scalaReflect(sv: String) = ivy"org.scala-lang:scala-reflect:$sv"
 }
 

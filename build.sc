@@ -104,7 +104,8 @@ trait DependencyJvm extends Dependency with DependencyMima {
     }
     def ivyDeps = Agg(
       Deps.expecty,
-      Deps.munit
+      Deps.munit,
+      Deps.pprint
     )
   }
 }
@@ -118,7 +119,8 @@ trait DependencyJs extends Dependency with ScalaJSModule {
     }
     def ivyDeps = Agg(
       Deps.expecty,
-      Deps.munit
+      Deps.munit,
+      Deps.pprint
     )
   }
 }
@@ -132,7 +134,8 @@ trait DependencyNative extends Dependency with ScalaNativeModule {
     }
     def ivyDeps = Agg(
       Deps.expecty,
-      Deps.munitForNative04
+      Deps.munitForNative04,
+      Deps.pprintForNative04
     )
   }
 }
