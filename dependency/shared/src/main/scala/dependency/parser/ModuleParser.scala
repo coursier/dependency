@@ -31,8 +31,10 @@ object ModuleParser {
     }
 
     for {
-      (org, name, nameAttributes) <- values
-      (name, attributes) <- parseNamePart(name)
+      (org, name0, nameAttributes) <- values
+      _ <- validateValue(org, "organization")
+      (name, attributes) <- parseNamePart(name0)
+      _ <- validateValue(name, "module name")
     } yield ModuleLike(org, name, nameAttributes, attributes)
   }
 
@@ -50,8 +52,10 @@ object ModuleParser {
     }
 
     for {
-      (org, name, nameAttributes, rest) <- values
-      (name, attributes) <- parseNamePart(name)
+      (org, name0, nameAttributes, rest) <- values
+      _ <- validateValue(org, "organization")
+      (name, attributes) <- parseNamePart(name0)
+      _ <- validateValue(name, "module name")
     } yield (ModuleLike(org, name, nameAttributes, attributes), rest.map(_.getOrElse("")).mkString(":"))
   }
 
@@ -71,4 +75,9 @@ object ModuleParser {
       Right((name, attributes.toMap))
     }
   }
+
+  private[dependency] def validateValue(value: String, name: String): Either[String, Unit] =
+    if (value.contains("/")) Left(s"$name $value contains invalid '/'")
+    else if (value.contains("\\")) Left(s"$name $value contains invalid '\\'")
+    else Right(())
 }

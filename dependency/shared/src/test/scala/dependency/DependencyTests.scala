@@ -21,4 +21,77 @@ class DependencyTests extends munit.FunSuite {
     )
     expect(res == expected)
   }
+
+  test("refuse to instantiate a dependency with slash in org") {
+    val createdModule =
+      try {
+        Dependency("or/g", "name", "1.2")
+        true
+      }
+      catch {
+        case _: IllegalArgumentException =>
+          false
+      }
+    assert(!createdModule)
+  }
+  test("refuse to instantiate a dependency with backslash in org") {
+    val createdModule =
+      try {
+        Dependency("org\\", "name", "1.2")
+        true
+      }
+      catch {
+        case _: IllegalArgumentException =>
+          false
+      }
+    assert(!createdModule)
+  }
+  test("refuse to instantiate a dependency with slash in name") {
+    val createdModule =
+      try {
+        Dependency("org", "n/ame", "1.2")
+        true
+      }
+      catch {
+        case _: IllegalArgumentException =>
+          false
+      }
+    assert(!createdModule)
+  }
+  test("refuse to instantiate a dependency with backslash in name") {
+    val createdModule =
+      try {
+        Dependency("org", "nam\\e", "1.2")
+        true
+      }
+      catch {
+        case _: IllegalArgumentException =>
+          false
+      }
+    assert(!createdModule)
+  }
+  test("refuse to instantiate a dependency with slash in version") {
+    val createdModule =
+      try {
+        Dependency("org", "name", "1./2")
+        true
+      }
+      catch {
+        case _: IllegalArgumentException =>
+          false
+      }
+    assert(!createdModule)
+  }
+  test("refuse to instantiate a dependency with backslash in version") {
+    val createdModule =
+      try {
+        Dependency("org", "name", "1\\.2")
+        true
+      }
+      catch {
+        case _: IllegalArgumentException =>
+          false
+      }
+    assert(!createdModule)
+  }
 }

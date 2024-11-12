@@ -38,6 +38,7 @@ object DependencyParser {
           }
 
         for {
+          _ <- ModuleParser.validateValue(version, "version")
           exclusions <- maybeExclusions
         } yield {
           val userParams = remainingParams.iterator.map(parseParam).toSeq ++ configOpt.toSeq.map("$inlineConfiguration" -> Some(_))

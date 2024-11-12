@@ -6,6 +6,9 @@ final case class DependencyLike[+A <: NameAttributes, +E <: NameAttributes](
   exclude: CovariantSet[ModuleLike[E]],
   userParams: Seq[(String, Option[String])]
 ) {
+
+  ModuleLike.validateValue(version, "version")
+
   def applyParams(params: ScalaParameters): Dependency =
     DependencyLike(
       module.applyParams(params),

@@ -32,4 +32,53 @@ class ModuleTests extends munit.FunSuite {
     expect(mod == expected)
   }
 
+  test("refuse to instantiate a module with slash in org") {
+    val createdModule =
+      try {
+        Module("or/g", "name")
+        true
+      }
+      catch {
+        case _: IllegalArgumentException =>
+          false
+      }
+    assert(!createdModule)
+  }
+  test("refuse to instantiate a module with backslash in org") {
+    val createdModule =
+      try {
+        Module("org\\", "name")
+        true
+      }
+      catch {
+        case _: IllegalArgumentException =>
+          false
+      }
+    assert(!createdModule)
+  }
+  test("refuse to instantiate a module with slash in name") {
+    val createdModule =
+      try {
+        Module("org", "n/ame")
+        true
+      }
+      catch {
+        case _: IllegalArgumentException =>
+          false
+      }
+    assert(!createdModule)
+  }
+  test("refuse to instantiate a module with backslash in name") {
+    val createdModule =
+      try {
+        Module("org", "nam\\e")
+        true
+      }
+      catch {
+        case _: IllegalArgumentException =>
+          false
+      }
+    assert(!createdModule)
+  }
+
 }
