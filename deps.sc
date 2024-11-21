@@ -9,7 +9,7 @@ object Scala {
 
 object Deps {
   def expecty = ivy"com.eed3si9n.expecty::expecty::0.16.0"
-  def interface = ivy"io.get-coursier:interface:1.0.23"
+  def interface = ivy"io.get-coursier:interface:1.0.24"
   def munit = ivy"org.scalameta::munit::1.0.2"
   def munitForNative04 = ivy"org.scalameta::munit::1.0.0"
   def pprint = ivy"com.lihaoyi::pprint::0.9.0"
