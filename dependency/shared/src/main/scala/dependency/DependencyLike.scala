@@ -40,8 +40,16 @@ final case class DependencyLike[+A <: NameAttributes, +E <: NameAttributes](
       .mkString
   private def paramsString: String =
     excludeString ++ userParamsString
-  def render: String =
-    s"${module.render}:$version$paramsString"
+  def render: String = {
+    val b = new StringBuilder
+    b ++= module.render
+    if (version.nonEmpty) {
+      b += ':'
+      b ++= version
+    }
+    b ++= paramsString
+    b.result()
+  }
   override def toString: String =
     render
 }

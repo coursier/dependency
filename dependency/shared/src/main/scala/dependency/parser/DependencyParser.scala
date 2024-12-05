@@ -25,6 +25,9 @@ object DependencyParser {
       case (module, remaining) =>
         val (version, configOpt, params) = splitRemainingPart(remaining, acceptInlineConfiguration)
         assert(acceptInlineConfiguration || configOpt.isEmpty)
+        val version0 =
+          if (acceptInlineConfiguration && version == " ") ""
+          else version
 
         val (excludeParams, remainingParams) = params.partition(_.startsWith("exclude="))
         val maybeExclusions = excludeParams
@@ -38,21 +41,18 @@ object DependencyParser {
           }
 
         for {
-          _ <- ModuleParser.validateValue(version, "version")
+          _ <- ModuleParser.validateValue(version0, "version")
           exclusions <- maybeExclusions
         } yield {
           val userParams = remainingParams.iterator.map(parseParam).toSeq ++ configOpt.toSeq.map("$inlineConfiguration" -> Some(_))
-          DependencyLike(module, version, exclusions, userParams)
+          DependencyLike(module, version0, exclusions, userParams)
         }
     }
-
-  private def attrSeparator = ","
-  private def argSeparator = ":"
 
   private def splitRemainingPart(input: String, acceptInlineConfiguration: Boolean): (String, Option[String], Seq[String]) = {
 
     def simpleSplit(s: String): (String, Seq[String]) =
-      s.split(attrSeparator) match {
+      s.split(ModuleParser.paramSeparator) match {
         case Array(coordsEnd, attrs @ _*) => (coordsEnd, attrs)
       }
 
@@ -72,7 +72,7 @@ object DependencyParser {
     }
 
     if (acceptInlineConfiguration)
-      versionPart.split(argSeparator, 2) match {
+      versionPart.split(ModuleParser.argSeparator, 2) match {
         case Array(ver, config) => (ver, Some(config), attrs0)
         case Array(ver) => (ver, None, attrs0)
       }
