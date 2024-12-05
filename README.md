@@ -19,7 +19,7 @@ Add `io.get-coursier::dependency::0.3.2` to your build:
 // Mill
 def ivyDeps = Agg(ivy"io.get-coursier::dependency::0.3.2")
 // sbt
-libraryDependencies += "io.get-coursier" %%% "dependency" % "0.3.2"
+libraryDependencies += "io.get-coursier" %% "dependency" % "0.3.2"
 ```
 
 The latest version is [![Maven Central](https://img.shields.io/maven-central/v/io.get-coursier/dependency_3.svg)](https://maven-badges.herokuapp.com/maven-central/io.get-coursier/dependency_3).
