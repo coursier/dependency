@@ -144,8 +144,8 @@ trait DependencyNative extends Dependency with ScalaNativeModule {
     }
     def ivyDeps = Agg(
       Deps.expecty,
-      Deps.munitForNative04,
-      Deps.pprintForNative04
+      Deps.munit,
+      Deps.pprint
     )
   }
 }
