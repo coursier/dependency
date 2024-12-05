@@ -3,6 +3,9 @@ package parser
 
 object ModuleParser {
 
+  private[parser] def paramSeparator = ","
+  private[parser] def argSeparator = ":"
+
   private implicit class EitherWithFilter[L, R](private val e: Either[L, R]) extends AnyVal {
     def withFilter(f: R => Boolean): Either[L, R] =
       if (e.forall(f)) e else throw new MatchError(e)
@@ -19,7 +22,7 @@ object ModuleParser {
     */
   def parse(input: String): Either[String, AnyModule] = {
 
-    val parts = input.split(":", -1).map(Some(_).filter(_.nonEmpty))
+    val parts = input.split(argSeparator, -1).map(Some(_).filter(_.nonEmpty))
 
     val values = parts match {
       case Array(Some(org), Some(name))                             => Right((org, name, NoAttributes))
@@ -40,7 +43,11 @@ object ModuleParser {
 
   def parsePrefix(input: String): Either[String, (AnyModule, String)] = {
 
-    val parts = input.split(":", -1).map(Some(_).filter(_.nonEmpty))
+    val (input0, paramsOpt) = input.split(paramSeparator, 2) match {
+      case Array(input0) => (input0, None)
+      case Array(input0, params) => (input0, Some(params))
+    }
+    val parts = input0.split(argSeparator, -1).map(Some(_).filter(_.nonEmpty))
 
     val values = parts match {
       case Array(Some(org), Some(name), rest @ _*)                             => Right((org, name, NoAttributes, rest))
@@ -56,7 +63,7 @@ object ModuleParser {
       _ <- validateValue(org, "organization")
       (name, attributes) <- parseNamePart(name0)
       _ <- validateValue(name, "module name")
-    } yield (ModuleLike(org, name, nameAttributes, attributes), rest.map(_.getOrElse("")).mkString(":"))
+    } yield (ModuleLike(org, name, nameAttributes, attributes), rest.map(_.getOrElse("")).mkString(argSeparator) + paramsOpt.fold("")(paramSeparator + _))
   }
 
   private def parseNamePart(input: String): Either[String, (String, Map[String, String])] = {
