@@ -7,7 +7,7 @@ import dependency.api.ops._
 class ApiTests extends munit.FunSuite {
 
   test("simple") {
-    val scalaParams = ScalaParameters("2.13.15")
+    val scalaParams = ScalaParameters("2.13.17")
     val dep = dep"io.get-coursier::coursier:2.1.0"
     val csDep = dep.applyParams(scalaParams).toCs
     val expectedCsDep = coursierapi.Dependency.of("io.get-coursier", "coursier_2.13", "2.1.0")
@@ -15,7 +15,7 @@ class ApiTests extends munit.FunSuite {
   }
 
   test("intransitive") {
-    val scalaParams = ScalaParameters("2.13.15")
+    val scalaParams = ScalaParameters("2.13.17")
     val dep = dep"io.get-coursier::coursier:2.1.0,intransitive"
     val csDep = dep.applyParams(scalaParams).toCs
     val expectedCsDep = coursierapi.Dependency.of("io.get-coursier", "coursier_2.13", "2.1.0")
@@ -24,7 +24,7 @@ class ApiTests extends munit.FunSuite {
   }
 
   test("classifier") {
-    val scalaParams = ScalaParameters("2.13.15")
+    val scalaParams = ScalaParameters("2.13.17")
     val dep = dep"io.get-coursier::coursier:2.1.0,classifier=tests"
     val csDep = dep.applyParams(scalaParams).toCs
     val expectedCsDep = coursierapi.Dependency.of("io.get-coursier", "coursier_2.13", "2.1.0")
@@ -34,7 +34,7 @@ class ApiTests extends munit.FunSuite {
   }
 
   test("type") {
-    val scalaParams = ScalaParameters("2.13.15")
+    val scalaParams = ScalaParameters("2.13.17")
     val dep = dep"io.get-coursier::coursier:2.1.0,type=jar"
     val csDep = dep.applyParams(scalaParams).toCs
     val expectedCsDep = coursierapi.Dependency.of("io.get-coursier", "coursier_2.13", "2.1.0")
@@ -44,7 +44,7 @@ class ApiTests extends munit.FunSuite {
   }
 
   test("ext") {
-    val scalaParams = ScalaParameters("2.13.15")
+    val scalaParams = ScalaParameters("2.13.17")
     val dep = dep"io.get-coursier::coursier:2.1.0,ext=foo"
     val csDep = dep.applyParams(scalaParams).toCs
     val expectedCsDep = coursierapi.Dependency.of("io.get-coursier", "coursier_2.13", "2.1.0")
@@ -53,7 +53,7 @@ class ApiTests extends munit.FunSuite {
   }
 
   test("exclusions") {
-    val scalaParams = ScalaParameters("2.13.15")
+    val scalaParams = ScalaParameters("2.13.17")
     val dep = dep"io.get-coursier::coursier:2.1.0,exclude=org.codehaus.plexus%plexus-container-default"
     val csDep = dep.applyParams(scalaParams).toCs
     val expectedCsDep = coursierapi.Dependency.of("io.get-coursier", "coursier_2.13", "2.1.0")
