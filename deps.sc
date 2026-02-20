@@ -11,7 +11,7 @@ object Deps {
   def expecty = ivy"com.eed3si9n.expecty::expecty::0.17.0"
   def interface = ivy"io.get-coursier:interface:1.0.28"
   def munit = ivy"org.scalameta::munit::1.0.4"
-  def pprint = ivy"com.lihaoyi::pprint::0.9.0"
+  def pprint = ivy"com.lihaoyi::pprint::0.9.6"
   def scalaReflect(sv: String) = ivy"org.scala-lang:scala-reflect:$sv"
 }
 
