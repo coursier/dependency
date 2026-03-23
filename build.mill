@@ -1,5 +1,6 @@
-import $ivy.`com.github.lolgab::mill-mima::0.0.24`
-import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
+//| mill-version: 1.1.4
+import $dep.`com.github.lolgab::mill-mima::0.2.1`
+import $dep.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.1`
 import $file.deps, deps.{Deps, Scala, Versions}
 
 import java.io.File
@@ -75,15 +76,6 @@ trait DependencyMima extends Mima {
       .map(coursier.core.Version(_))
       .sorted
       .map(_.repr)
-  }
-  // Remove once 0.3.0 is out
-  def mimaPreviousArtifacts = T {
-    val versions     = mimaPreviousVersions()
-    val organization = pomSettings().organization
-    val artifactId0  = artifactId()
-    Agg.from(
-      versions.map(version => ivy"$organization:$artifactId0:$version")
-    )
   }
 }
 
