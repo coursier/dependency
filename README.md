@@ -8,6 +8,7 @@
 - support for exclusions, override URLs for artifacts, …
 - support for Ivy module attributes
 - `toString` representation that can be parsed back
+- module matchers, accepting `*` wildcards
 - powerful string interpolator
 - Scala binary version computation
 - …
@@ -124,6 +125,34 @@ else).
 assert(mod.organization == "io.get-coursier")
 assert(mod.name == "coursier")
 assert(javaMod.name == "coursier_2.13")
+```
+
+### Matching modules
+
+`ModuleMatcher` matches modules against a module whose organization, name, and attribute values
+can contain `*` wildcards:
+```scala mdoc
+val matcher = ModuleMatcher(mod"io.get-coursier::coursier-*")
+
+assert(matcher.matches(mod"io.get-coursier::coursier-cache"))
+assert(!matcher.matches(mod"io.get-coursier::dependency"))
+```
+
+Name attributes (Scala module or not, fully cross-versioned or not, platform suffix or not) are
+taken into account too, unless `matchNameAttributes` is `false`:
+```scala mdoc
+assert(!matcher.matches(mod"io.get-coursier:coursier-cache"))
+
+val looseMatcher = ModuleMatcher(mod"io.get-coursier:coursier-*", matchNameAttributes = false)
+assert(looseMatcher.matches(mod"io.get-coursier:coursier-cache"))
+assert(looseMatcher.matches(mod"io.get-coursier::coursier-cache"))
+```
+
+Matchers can also be parsed, and `ModuleMatcher.all` matches any module:
+```scala mdoc
+val parsedMatcher: Either[String, ModuleMatcher] = ModuleMatcher.parse("io.get-coursier::coursier-*")
+
+assert(ModuleMatcher.all.matches(mod"io.get-coursier::coursier"))
 ```
 
 ### Exclusions
