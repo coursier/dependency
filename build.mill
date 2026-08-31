@@ -11,7 +11,7 @@ import mill.api.BuildCtx
 import mill.scalalib.*
 import mill.scalajslib.*
 import mill.scalanativelib.*
-import mill.util.VcsVersion
+import mill.util.{Jvm, VcsVersion}
 import millbuild.{Deps, Scala, Versions}
 
 object dependency extends Module {
@@ -35,6 +35,13 @@ trait DependencyPublishModule extends PublishModule {
       Developer("alexarchambault", "Alex Archambault","https://github.com/alexarchambault")
     )
   )
+
+  // Maven Central requires a doc JAR to be published, but the Scaladoc of these
+  // modules isn't used anywhere, and generating it dominates publishing time.
+  // Publish an empty JAR (just a manifest) instead.
+  override def docJar = Task {
+    PathRef(Jvm.createJar(Task.dest / "out.jar", Seq.empty[os.Path], manifest()))
+  }
 
   def publishVersion = Task {
     val state = VcsVersion.vcsState()
