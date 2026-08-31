@@ -1,15 +1,18 @@
-import $ivy.`com.github.lolgab::mill-mima::0.0.24`
-import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
-import $file.deps, deps.{Deps, Scala, Versions}
+//| mill-version: 1.1.8
+//| mvnDeps:
+//| - com.github.lolgab::mill-mima::0.2.2
+
+package build
 
 import java.io.File
 import com.github.lolgab.mill.mima.Mima
-import de.tobiasroeser.mill.vcs.version._
-import mill._
-import mill.scalalib._
-import mill.scalajslib._
-import mill.scalanativelib._
-import scala.concurrent.duration.DurationInt
+import mill.*
+import mill.api.BuildCtx
+import mill.scalalib.*
+import mill.scalajslib.*
+import mill.scalanativelib.*
+import mill.util.{Jvm, VcsVersion}
+import millbuild.{Deps, Scala, Versions}
 
 object dependency extends Module {
   object jvm extends Cross[DependencyJvm](Scala.all)
@@ -20,7 +23,7 @@ object `dependency-interface` extends Cross[DependencyInterface](Scala.all)
 
 trait DependencyPublishModule extends PublishModule {
 
-  import mill.scalalib.publish._
+  import mill.scalalib.publish.*
 
   def pomSettings = PomSettings(
     description = artifactName(),
@@ -33,7 +36,14 @@ trait DependencyPublishModule extends PublishModule {
     )
   )
 
-  def publishVersion = T {
+  // Maven Central requires a doc JAR to be published, but the Scaladoc of these
+  // modules isn't used anywhere, and generating it dominates publishing time.
+  // Publish an empty JAR (just a manifest) instead.
+  override def docJar = Task {
+    PathRef(Jvm.createJar(Task.dest / "out.jar", Seq.empty[os.Path], manifest()))
+  }
+
+  def publishVersion = Task {
     val state = VcsVersion.vcsState()
     if (state.commitsSinceLastTag > 0) {
       val versionOrEmpty = state.lastTag
@@ -57,13 +67,13 @@ trait DependencyPublishModule extends PublishModule {
   }
 }
 
-trait DependencyMima extends Mima {
-  def mimaPreviousVersions: T[Seq[String]] = T.input {
+trait DependencyMima extends Mima with DependencyPublishModule {
+  def mimaPreviousVersions: T[Seq[String]] = Task.Input {
     val current = os.proc("git", "describe", "--tags", "--match", "v*")
-      .call(cwd = T.workspace)
+      .call(cwd = BuildCtx.workspaceRoot)
       .out.trim()
     os.proc("git", "tag", "-l")
-      .call(cwd = T.workspace)
+      .call(cwd = BuildCtx.workspaceRoot)
       .out.lines()
       .filter(_ != current)
       .filter(_.startsWith("v"))
@@ -72,18 +82,16 @@ trait DependencyMima extends Mima {
       .filter(!_.startsWith("0.0."))
       .filter(!_.startsWith("0.1."))
       .filter(!_.startsWith("0.2."))
-      .map(coursier.core.Version(_))
+      .map(coursier.version.Version(_))
       .sorted
       .map(_.repr)
   }
   // Remove once 0.3.0 is out
-  def mimaPreviousArtifacts = T {
+  def mimaPreviousArtifacts = Task {
     val versions     = mimaPreviousVersions()
     val organization = pomSettings().organization
     val artifactId0  = artifactId()
-    Agg.from(
-      versions.map(version => ivy"$organization:$artifactId0:$version")
-    )
+    versions.map(version => mvn"$organization:$artifactId0:$version")
   }
 }
 
@@ -94,14 +102,16 @@ private def scalaDirNames(sv: String): Seq[String] = {
   Seq("scala", s"scala-$major", s"scala-$sbv", s"scala-$sv")
 }
 
+private def sharedSourcePaths(sv: String, mainOrTest: String): Seq[os.Path] =
+  scalaDirNames(sv).map(BuildCtx.workspaceRoot / "dependency" / "shared" / "src" / mainOrTest / _)
+
 trait Dependency extends CrossSbtModule with DependencyPublishModule {
-  def sources = T.sources {
-    super.sources() ++ scalaDirNames(scalaVersion()).map(T.workspace / "dependency" / "shared" / "src" / "main" / _).map(PathRef(_))
-  }
-  def compileIvyDeps = T{
+  def sharedSources = Task.Sources(sharedSourcePaths(crossScalaVersion, "main")*)
+  def sources = Task { super.sources() ++ sharedSources() }
+  def compileMvnDeps = Task{
     val sv = scalaVersion()
-    if (sv.startsWith("2.")) Agg(Deps.scalaReflect(sv))
-    else Agg.empty[Dep]
+    if (sv.startsWith("2.")) Seq(Deps.scalaReflect(sv))
+    else Seq.empty[Dep]
   }
   def scalacOptions = super.scalacOptions() ++ Seq("-release", "8")
 }
@@ -109,10 +119,9 @@ trait Dependency extends CrossSbtModule with DependencyPublishModule {
 trait DependencyJvm extends Dependency with DependencyMima {
   def artifactName = "dependency"
   object test extends CrossSbtTests with TestModule.Munit {
-    def sources = T.sources {
-      super.sources() ++ scalaDirNames(scalaVersion()).map(T.workspace / "dependency" / "shared" / "src" / "test" / _).map(PathRef(_))
-    }
-    def ivyDeps = Agg(
+    def sharedSources = Task.Sources(sharedSourcePaths(crossScalaVersion, "test")*)
+    def sources = Task { super.sources() ++ sharedSources() }
+    def mvnDeps = Seq(
       Deps.expecty,
       Deps.munit,
       Deps.pprint
@@ -124,10 +133,9 @@ trait DependencyJs extends Dependency with ScalaJSModule {
   def artifactName = "dependency"
   def scalaJSVersion = Versions.scalaJs
   object test extends CrossSbtTests with ScalaJSTests with TestModule.Munit {
-    def sources = T.sources {
-      super.sources() ++ scalaDirNames(scalaVersion()).map(T.workspace / "dependency" / "shared" / "src" / "test" / _).map(PathRef(_))
-    }
-    def ivyDeps = Agg(
+    def sharedSources = Task.Sources(sharedSourcePaths(crossScalaVersion, "test")*)
+    def sources = Task { super.sources() ++ sharedSources() }
+    def mvnDeps = Seq(
       Deps.expecty,
       Deps.munit,
       Deps.pprint
@@ -139,10 +147,9 @@ trait DependencyNative extends Dependency with ScalaNativeModule {
   def artifactName = "dependency"
   def scalaNativeVersion = Versions.scalaNative
   object test extends CrossSbtTests with ScalaNativeTests with TestModule.Munit {
-    def sources = T.sources {
-      super.sources() ++ scalaDirNames(scalaVersion()).map(T.workspace / "dependency" / "shared" / "src" / "test" / _).map(PathRef(_))
-    }
-    def ivyDeps = Agg(
+    def sharedSources = Task.Sources(sharedSourcePaths(crossScalaVersion, "test")*)
+    def sources = Task { super.sources() ++ sharedSources() }
+    def mvnDeps = Seq(
       Deps.expecty,
       Deps.munit,
       Deps.pprint
@@ -157,26 +164,24 @@ trait DependencyInterface extends CrossSbtModule with DependencyPublishModule {
     dependency.jvm()
   )
 
-  def ivyDeps = super.ivyDeps() ++ Agg(
+  def mvnDeps = super.mvnDeps() ++ Seq(
     Deps.interface
   )
   def scalacOptions = super.scalacOptions() ++ Seq("-release", "8")
   object test extends CrossSbtTests with TestModule.Munit {
-    def ivyDeps = Agg(
+    def mvnDeps = Seq(
       Deps.expecty,
       Deps.munit
     )
   }
 }
 
-def readme = T.sources {
-  Seq(PathRef(T.workspace / "README.md"))
-}
+def readme = Task.Sources(BuildCtx.workspaceRoot / "README.md")
 
 private def mdocScalaVersion = Scala.scala213
-def mdoc(args: String*) = T.command {
+def mdoc(args: String*) = Task.Command {
   val readme0 = readme().head.path
-  val dest = T.dest / "README.md"
+  val dest = Task.dest / "README.md"
   val cp = (dependency.jvm(mdocScalaVersion).runClasspath() :+ dependency.jvm(mdocScalaVersion).jar())
     .map(_.path)
     .filter(os.exists(_))
@@ -188,62 +193,9 @@ def mdoc(args: String*) = T.command {
     "--classpath", cp.mkString(File.pathSeparator)
   )
   os.proc(cmd, "--", mdocArgs, args).call(
-    cwd = T.workspace,
+    cwd = BuildCtx.workspaceRoot,
     stdin = os.Inherit,
     stdout = os.Inherit,
     stderr = os.Inherit
   )
 }
-
-def publishSonatype(tasks: mill.main.Tasks[PublishModule.PublishData]) =
-  T.command {
-    import scala.concurrent.duration._
-
-    val data = T.sequence(tasks.value)()
-    val log  = T.ctx().log
-
-    val credentials = sys.env("SONATYPE_USERNAME") + ":" + sys.env("SONATYPE_PASSWORD")
-    val pgpPassword = sys.env("PGP_PASSPHRASE")
-    val timeout     = 10.minutes
-
-    val artifacts = data.map {
-      case PublishModule.PublishData(a, s) =>
-        (s.map { case (p, f) => (p.path, f) }, a)
-    }
-
-    val isRelease = {
-      val versions = artifacts.map(_._2.version).toSet
-      val set      = versions.map(!_.endsWith("-SNAPSHOT"))
-      assert(
-        set.size == 1,
-        s"Found both snapshot and non-snapshot versions: ${versions.toVector.sorted.mkString(", ")}",
-      )
-      set.head
-    }
-    val publisher = new scalalib.publish.SonatypePublisher(
-      uri = "https://oss.sonatype.org/service/local",
-      snapshotUri = "https://oss.sonatype.org/content/repositories/snapshots",
-      credentials = credentials,
-      signed = true,
-      gpgArgs = Seq(
-        "--detach-sign",
-        "--batch=true",
-        "--yes",
-        "--pinentry-mode",
-        "loopback",
-        "--passphrase",
-        pgpPassword,
-        "--armor",
-        "--use-agent",
-      ),
-      readTimeout = timeout.toMillis.toInt,
-      connectTimeout = timeout.toMillis.toInt,
-      log = log,
-      workspace = T.workspace,
-      env = Map.empty,
-      awaitTimeout = timeout.toMillis.toInt,
-      stagingRelease = isRelease,
-    )
-
-    publisher.publishAll(isRelease, artifacts: _*)
-  }
