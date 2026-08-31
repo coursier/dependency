@@ -11,12 +11,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
         submodules: true
-    - uses: coursier/cache-action@v6
-    - uses: coursier/setup-action@v1
+    - uses: coursier/cache-action@v8
+    - uses: coursier/setup-action@v3
       with:
         jvm: 21
     - name: Test
@@ -27,12 +27,12 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
         submodules: true
-    - uses: coursier/cache-action@v6
-    - uses: coursier/setup-action@v1
+    - uses: coursier/cache-action@v8
+    - uses: coursier/setup-action@v3
       with:
         jvm: 21
     - name: MiMA
@@ -42,20 +42,26 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
         submodules: true
-    - uses: coursier/cache-action@v6
-    - uses: coursier/setup-action@v1
+    - uses: coursier/cache-action@v8
+    - uses: coursier/setup-action@v3
       with:
         jvm: 21
-    - run: .github/scripts/gpg-setup.sh
-      env:
-        PGP_SECRET: ${{ secrets.PUBLISH_SECRET_KEY }}
     - name: Release
-      run: ./mill -i publishSonatype --tasks __.publishArtifacts
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          ./mill -i mill.scalalib.SonatypeCentralPublishModule/ --bundleName "dependency-${GITHUB_REF#refs/tags/v}"
+        else
+          for tag in $(git tag --points-at HEAD); do
+            git tag -d "$tag"
+          done
+          ./mill -i mill.scalalib.SonatypeCentralPublishModule/
+        fi
       env:
-        PGP_PASSPHRASE: ${{ secrets.PUBLISH_SECRET_KEY_PASSWORD }}
-        SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-        SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+        MILL_PGP_SECRET_BASE64: ${{ secrets.PUBLISH_SECRET_KEY }}
+        MILL_PGP_PASSPHRASE: ${{ secrets.PUBLISH_SECRET_KEY_PASSWORD }}
+        MILL_SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+        MILL_SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
