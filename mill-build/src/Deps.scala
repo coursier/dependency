@@ -21,5 +21,5 @@ object Deps {
 object Versions {
   def mdoc = "2.3.6"
   def scalaJs = "1.17.0"
-  def scalaNative = "0.5.5"
+  def scalaNative = "0.5.12"
 }
