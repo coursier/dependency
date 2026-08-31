@@ -6,7 +6,7 @@ import mill.scalalib.*
 object Scala {
   def scala212 = "2.12.21"
   def scala213 = "2.13.15"
-  def scala3 = "3.3.4"
+  def scala3 = "3.3.8"
   def all = Seq(scala212, scala213, scala3)
 }
 
@@ -20,6 +20,6 @@ object Deps {
 
 object Versions {
   def mdoc = "2.3.6"
-  def scalaJs = "1.17.0"
+  def scalaJs = "1.22.0"
   def scalaNative = "0.5.12"
 }
