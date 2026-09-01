@@ -121,7 +121,7 @@ trait DependencyJvm extends Dependency with DependencyMima {
   object test extends CrossSbtTests with TestModule.Munit {
     def sharedSources = Task.Sources(sharedSourcePaths(crossScalaVersion, "test")*)
     def sources = Task { super.sources() ++ sharedSources() }
-    def mvnDeps = Seq(
+    def mvnDeps = super.mvnDeps() ++ Seq(
       Deps.expecty,
       Deps.munit,
       Deps.pprint
@@ -135,7 +135,7 @@ trait DependencyJs extends Dependency with ScalaJSModule {
   object test extends CrossSbtTests with ScalaJSTests with TestModule.Munit {
     def sharedSources = Task.Sources(sharedSourcePaths(crossScalaVersion, "test")*)
     def sources = Task { super.sources() ++ sharedSources() }
-    def mvnDeps = Seq(
+    def mvnDeps = super.mvnDeps() ++ Seq(
       Deps.expecty,
       Deps.munit,
       Deps.pprint
@@ -149,7 +149,7 @@ trait DependencyNative extends Dependency with ScalaNativeModule {
   object test extends CrossSbtTests with ScalaNativeTests with TestModule.Munit {
     def sharedSources = Task.Sources(sharedSourcePaths(crossScalaVersion, "test")*)
     def sources = Task { super.sources() ++ sharedSources() }
-    def mvnDeps = Seq(
+    def mvnDeps = super.mvnDeps() ++ Seq(
       Deps.expecty,
       Deps.munit,
       Deps.pprint
@@ -169,7 +169,7 @@ trait DependencyInterface extends CrossSbtModule with DependencyPublishModule {
   )
   def scalacOptions = super.scalacOptions() ++ Seq("-release", "8")
   object test extends CrossSbtTests with TestModule.Munit {
-    def mvnDeps = Seq(
+    def mvnDeps = super.mvnDeps() ++ Seq(
       Deps.expecty,
       Deps.munit
     )
