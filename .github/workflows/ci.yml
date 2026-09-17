@@ -56,12 +56,12 @@ jobs:
     - name: Release
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          ./mill -i mill.scalalib.SonatypeCentralPublishModule/ --bundleName "dependency-${GITHUB_REF#refs/tags/v}" --shouldRelease false
+          ./mill -i ci.publishSonatypeCentral --bundleName "dependency-${GITHUB_REF#refs/tags/v}" --shouldRelease false
         else
           for tag in $(git tag --points-at HEAD); do
             git tag -d "$tag"
           done
-          ./mill -i mill.scalalib.SonatypeCentralPublishModule/
+          ./mill -i ci.publishSonatypeCentral
         fi
       env:
         MILL_PGP_SECRET_BASE64: ${{ secrets.PUBLISH_SECRET_KEY }}

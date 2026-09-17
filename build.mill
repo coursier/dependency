@@ -1,6 +1,10 @@
 //| mill-version: 1.1.8
 //| mvnDeps:
 //| - com.github.lolgab::mill-mima::0.2.2
+//| # Provided-scope dependency of mill-libs-javalib, needed by the temporary
+//| # mill-build/src/mill/javalib/DependencySonatypeCentralPublish.scala - drop both once Mill
+//| # stops checksumming PGP signatures
+//| - com.lumidion::sonatype-central-client-requests:0.6.0
 
 package build
 
@@ -185,6 +189,8 @@ trait DependencyInterface extends CrossSbtModule with DependencyPublishModule {
     )
   }
 }
+
+object ci extends Module with mill.javalib.DependencySonatypeCentralPublish
 
 def readme = Task.Sources(BuildCtx.workspaceRoot / "README.md")
 
