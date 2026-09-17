@@ -30,7 +30,7 @@ The examples below assume `dependency._` is imported:
 import dependency._
 ```
 
-*dependency* is published for Scala 2.12, 2.13, and 3, for the JVM, Scala.JS, and Scala Native.
+*dependency* is published for Scala 2.12, 2.13, and 3 for the JVM, and for Scala 3 only for Scala.JS and Scala Native.
 It is compatible with JDK back to 8.
 
 ### Dependencies

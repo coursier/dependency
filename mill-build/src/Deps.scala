@@ -8,6 +8,8 @@ object Scala {
   def scala213 = "2.13.18"
   def scala3 = "3.3.8"
   def all = Seq(scala212, scala213, scala3)
+  // Scala.js and Scala Native modules are only built and published for Scala 3
+  def jsNative = Seq(scala3)
 }
 
 object Deps {
