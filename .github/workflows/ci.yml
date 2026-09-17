@@ -56,7 +56,7 @@ jobs:
     - name: Release
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-          ./mill -i mill.scalalib.SonatypeCentralPublishModule/ --bundleName "dependency-${GITHUB_REF#refs/tags/v}"
+          ./mill -i mill.scalalib.SonatypeCentralPublishModule/ --bundleName "dependency-${GITHUB_REF#refs/tags/v}" --shouldRelease false
         else
           for tag in $(git tag --points-at HEAD); do
             git tag -d "$tag"
