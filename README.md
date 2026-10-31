@@ -15,6 +15,19 @@
 - Scala binary version computation
 - …
 
+- [Usage](#usage)
+  - [String syntax](#string-syntax)
+  - [Types](#types)
+  - [Dependencies](#dependencies)
+  - [Modules](#modules)
+  - [Matching modules](#matching-modules)
+  - [Exclusions](#exclusions)
+  - [Parameters](#parameters)
+  - [Scala binary version](#scala-binary-version)
+  - [Conversions](#conversions)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Usage
 
 Add `io.get-coursier::dependency::0.3.3` to your build:
@@ -153,7 +166,7 @@ The interpolated strings are validated at compile-time. As a consequence, string
 (`depName`, `ver` above) should not contain separators (these will be part of the name, version, …,
 else).
 
-### Accessing fields
+#### Accessing fields
 
 ```scala mdoc
 assert(dep.organization == "io.get-coursier")
@@ -195,7 +208,7 @@ The interpolated strings are validated at compile-time. As a consequence, string
 (`modName` above) should not contain separators (these will be part of the name, …,
 else).
 
-### Accessing fields
+#### Accessing fields
 
 ```scala mdoc
 assert(mod.organization == "io.get-coursier")
