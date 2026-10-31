@@ -198,7 +198,10 @@ private def mdocScalaVersion = Scala.scala213
 def mdoc(args: String*) = Task.Command {
   val readme0 = readme().head.path
   val dest = Task.dest / "README.md"
-  val cp = (dependency.jvm(mdocScalaVersion).runClasspath() :+ dependency.jvm(mdocScalaVersion).jar())
+  val cp = (`dependency-interface`(mdocScalaVersion).runClasspath() ++ Seq(
+    dependency.jvm(mdocScalaVersion).jar(),
+    `dependency-interface`(mdocScalaVersion).jar()
+  ))
     .map(_.path)
     .filter(os.exists(_))
     .filter(!os.isDir(_))

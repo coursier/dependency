@@ -202,16 +202,16 @@ def ivyDeps = Agg(ivy"io.get-coursier::dependency-interface:0.2.3")
 ```
 
 Then do
-```scala
+```scala mdoc
 import dependency.api.ApiConverter
-ApiConverter.module(mod"io.get-coursier::coursier") // coursierapi.Module
+ApiConverter.module(mod"io.get-coursier::coursier".applyParams(ScalaParameters("2.13.6"))) // coursierapi.Module
 ApiConverter.dependency(dep"io.get-coursier::coursier:2.0.6".applyParams(ScalaParameters("2.13.6"))) // coursierapi.Dependency
 ```
 
 Alternatively, the dependency-interface module also provides implicit conversions for these:
-```scala
+```scala mdoc
 import dependency.api.ops._
-mod"io.get-coursier::coursier".toCs // coursierapi.Module
+mod"io.get-coursier::coursier".applyParams(ScalaParameters("2.13.6")).toCs // coursierapi.Module
 dep"io.get-coursier::coursier:2.0.6".applyParams(ScalaParameters("2.13.6")).toCs // coursierapi.Dependency
 ```
 
