@@ -6,14 +6,13 @@
 *dependency* is a library to parse and handle Java and Scala dependencies, written as strings like
 `org::name:1.0`. It's used by [coursier](https://github.com/coursier/coursier) and
 [Scala CLI](https://github.com/VirtusLab/scala-cli), among others. It features:
-- support for both Java and Scala dependencies (simply or fully cross-versioned, Scala.JS and Scala Native dependencies)
+- support for both Java and Scala dependencies (simply or fully cross-versioned, Scala.js and Scala Native dependencies)
 - support for exclusions and custom parameters (classifiers, override URLs for artifacts, …)
 - support for Ivy module attributes
 - `toString` representation that can be parsed back
 - module matchers, accepting `*` wildcards
-- powerful string interpolator
+- string interpolators, validating dependencies and modules at compile-time
 - Scala binary version computation
-- …
 
 - [Usage](#usage)
   - [String syntax](#string-syntax)
@@ -45,7 +44,7 @@ The examples below assume `dependency._` is imported:
 import dependency._
 ```
 
-*dependency* is published for Scala 2.12, 2.13, and 3 for the JVM, and for Scala 3 only for Scala.JS and Scala Native.
+*dependency* is published for Scala 2.12, 2.13, and 3 for the JVM, and for Scala 3 only for Scala.js and Scala Native.
 It is compatible with JDK back to 8.
 
 ### String syntax
