@@ -293,6 +293,22 @@ mod"io.get-coursier::coursier".applyParams(ScalaParameters("2.13.6")).toCs // co
 dep"io.get-coursier::coursier:2.0.6".applyParams(ScalaParameters("2.13.6")).toCs // coursierapi.Dependency
 ```
 
+## Contributing
+
+*dependency* is built with [Mill](https://mill-build.org). The `mill` launcher is in the repository,
+and needs a JVM:
+```text
+$ ./mill -i __.test                       # run the tests
+$ ./mill -i __.mimaReportBinaryIssues     # check binary compatibility
+$ ./mill -i mdoc                          # compile the README examples
+```
+
+`mdoc` needs the [`cs` command](https://get-coursier.io/docs/cli-installation). It leaves
+`README.md` as is, and only checks that the examples in `scala mdoc` code blocks compile and run.
+
+Versions are deduced from `v*` git tags. Pushes to `main` publish snapshots, and pushing a tag
+uploads a release to Sonatype Central, where it still has to be released manually.
+
 ## License
 
 Licensed under the Apache 2.0 license.
