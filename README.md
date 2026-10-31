@@ -72,6 +72,26 @@ val syntaxDep = dep"org::name::1.0,exclude=other%%lib,key=value"
 assert(syntaxDep.toString == "org::name::1.0,exclude=other%%lib,key=value")
 ```
 
+### Types
+
+| Module        | Dependency        | Name attributes                                                   |
+|---------------|-------------------|-------------------------------------------------------------------|
+| `Module`      | `Dependency`      | None: the name is final                                           |
+| `ScalaModule` | `ScalaDependency` | Scala ones: `applyParams` must be called to get the final name    |
+| `AnyModule`   | `AnyDependency`   | Either of the above                                               |
+
+`applyParams` returns a `Module` or a `Dependency`. Parsers return an `AnyModule` or an
+`AnyDependency`, as the kind of their input is only known at runtime. String interpolators
+return the most precise type:
+```scala mdoc
+val javaModule: Module = mod"org:name"
+val scalaModule: ScalaModule = mod"org::name"
+val javaDependency: Dependency = dep"org:name:1.0"
+val scalaDependency: ScalaDependency = dep"org::name:1.0"
+```
+
+Exclusions are kept in a `CovariantSet`, a set that, unlike `Set`, is covariant in its element type.
+
 ### Dependencies
 
 #### Parsing
@@ -238,7 +258,8 @@ def mvnDeps = Seq(mvn"io.get-coursier::dependency-interface:0.3.3")
 libraryDependencies += "io.get-coursier" %% "dependency-interface" % "0.3.3"
 ```
 
-Then do
+These conversions only accept `Module` and `Dependency`, so `applyParams` must be called first
+on Scala modules and dependencies:
 ```scala mdoc
 import dependency.api.ApiConverter
 ApiConverter.module(mod"io.get-coursier::coursier".applyParams(ScalaParameters("2.13.6"))) // coursierapi.Module
