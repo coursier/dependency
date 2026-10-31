@@ -33,7 +33,7 @@ trait DependencyPublishModule extends PublishModule {
     description = artifactName(),
     organization = "io.get-coursier",
     url = "https://github.com/coursier/dependency",
-    licenses = Seq(License.`BSD-3-Clause`),
+    licenses = Seq(License.`Apache-2.0`),
     versionControl = VersionControl.github("coursier", "dependency"),
     developers = Seq(
       Developer("alexarchambault", "Alex Archambault","https://github.com/alexarchambault")
