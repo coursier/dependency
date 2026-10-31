@@ -15,12 +15,12 @@
 
 ## Usage
 
-Add `io.get-coursier::dependency::0.3.2` to your build:
+Add `io.get-coursier::dependency::0.3.3` to your build:
 ```scala
 // Mill
-def ivyDeps = Agg(ivy"io.get-coursier::dependency::0.3.2")
+def ivyDeps = Agg(ivy"io.get-coursier::dependency::0.3.3")
 // sbt
-libraryDependencies += "io.get-coursier" %%% "dependency" % "0.3.2"
+libraryDependencies += "io.get-coursier" %%% "dependency" % "0.3.3"
 ```
 
 The latest version is [![Maven Central](https://img.shields.io/maven-central/v/io.get-coursier/dependency_3.svg)](https://maven-badges.herokuapp.com/maven-central/io.get-coursier/dependency_3).
@@ -193,12 +193,12 @@ assert(ScalaVersion.nativeBinary("0.4.0") == Some("0.4"))
 
 Add a dependency towards `io.get-coursier::dependency-interface`:
 
-Add `io.get-coursier::dependency-interface:0.2.3` to your build:
+Add `io.get-coursier::dependency-interface:0.3.3` to your build:
 ```scala
 // sbt
-libraryDependencies += "io.get-coursier" %% "dependency-interface" % "0.2.3"
+libraryDependencies += "io.get-coursier" %% "dependency-interface" % "0.3.3"
 // mill
-def ivyDeps = Agg(ivy"io.get-coursier::dependency-interface:0.2.3")
+def ivyDeps = Agg(ivy"io.get-coursier::dependency-interface:0.3.3")
 ```
 
 Then do
