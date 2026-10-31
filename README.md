@@ -33,6 +33,45 @@ import dependency._
 *dependency* is published for Scala 2.12, 2.13, and 3 for the JVM, and for Scala 3 only for Scala.JS and Scala Native.
 It is compatible with JDK back to 8.
 
+### String syntax
+
+The parsers and string interpolators below all accept the same syntax.
+
+The separators before and after the name say how it should be cross-versioned:
+
+| Dependency        | Kind                                | Name with Scala 2.13.6 and platform `sjs1` |
+|-------------------|-------------------------------------|--------------------------------------------|
+| `org:name:1.0`    | Java                                | `name`                                     |
+| `org::name:1.0`   | Scala                               | `name_2.13`                                |
+| `org:::name:1.0`  | Scala, fully cross-versioned        | `name_2.13.6`                              |
+| `org::name::1.0`  | Scala, with platform                | `name_sjs1_2.13`                           |
+| `org:::name::1.0` | Scala, fully cross-versioned, with platform | `name_sjs1_2.13.6`                 |
+
+Modules are written the same way, without a version. As there's no version to
+separate from the name, a platform suffix is then marked by a single trailing `:`, like in
+`org::name:` or `org:::name:`.
+
+Other parts of the syntax:
+
+| Dependency                          | Meaning                                                              |
+|-------------------------------------|----------------------------------------------------------------------|
+| `org:name;attr1=a;attr2=b:1.0`      | Ivy module attributes, also accepted in modules                      |
+| `org:name`                          | No version: `version` is empty                                       |
+| `org:name:[1.0,2.0)`                | Version interval                                                     |
+| `org:name:1.0:runtime`              | Inline configuration, added to `userParams` as `$inlineConfiguration` |
+| `org:name:1.0,exclude=other%lib`    | Excludes the Java module `other:lib`                                 |
+| `org:name:1.0,exclude=other%%lib`   | Excludes the Scala module `other::lib`                               |
+| `org:name:1.0,key=value,flag`       | Custom parameters                                                    |
+
+Organizations, names, and versions can't contain `/` or `\`.
+
+`toString` gives back that syntax, so dependencies and modules can be parsed back:
+```scala mdoc
+val syntaxDep = dep"org::name::1.0,exclude=other%%lib,key=value"
+
+assert(syntaxDep.toString == "org::name::1.0,exclude=other%%lib,key=value")
+```
+
 ### Dependencies
 
 #### Parsing
