@@ -5,7 +5,7 @@
 
 *dependency* is a library to parse and handle Java and Scala dependencies. It features:
 - support for both Java and Scala dependencies (simply or fully cross-versioned, Scala.JS and Scala Native dependencies)
-- support for exclusions, override URLs for artifacts, …
+- support for exclusions and custom parameters (classifiers, override URLs for artifacts, …)
 - support for Ivy module attributes
 - `toString` representation that can be parsed back
 - module matchers, accepting `*` wildcards
@@ -233,6 +233,11 @@ val depWithParams = dep"io.get-coursier::coursier:2.0.6,url=https://dl.cs/cs.jar
 
 assert(depWithParams.userParams == Seq("url" -> Some("https://dl.cs/cs.jar"), "intransitive" -> None))
 ```
+
+*dependency* only keeps these parameters, it's up to users to give them a meaning. When
+[converting to a coursier interface dependency](#to-coursier-interface-dependency), `classifier`,
+`type`, `ext`, and `intransitive` are taken into account. Other parameters, like `url` above, are
+ignored.
 
 ### Scala binary version
 
