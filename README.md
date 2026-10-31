@@ -3,7 +3,9 @@
 [![Build status](https://github.com/coursier/dependency/workflows/CI/badge.svg)](https://github.com/coursier/dependency/actions?query=workflow%3ACI)
 [![Maven Central](https://img.shields.io/maven-central/v/io.get-coursier/dependency_3.svg)](https://maven-badges.herokuapp.com/maven-central/io.get-coursier/dependency_3)
 
-*dependency* is a library to parse and handle Java and Scala dependencies. It features:
+*dependency* is a library to parse and handle Java and Scala dependencies, written as strings like
+`org::name:1.0`. It's used by [coursier](https://github.com/coursier/coursier) and
+[Scala CLI](https://github.com/VirtusLab/scala-cli), among others. It features:
 - support for both Java and Scala dependencies (simply or fully cross-versioned, Scala.JS and Scala Native dependencies)
 - support for exclusions and custom parameters (classifiers, override URLs for artifacts, …)
 - support for Ivy module attributes
