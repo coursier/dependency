@@ -162,9 +162,9 @@ val ver = "2.0.6"
 val dep2: AnyDependency = dep"io.get-coursier::$depName:$ver"
 ```
 
-The interpolated strings are validated at compile-time. As a consequence, string parameters
-(`depName`, `ver` above) should not contain separators (these will be part of the name, version, …,
-else).
+The interpolated strings are validated at compile-time. Interpolated values (`depName`, `ver` above)
+are inserted as is afterwards, so any separator they contain, like `:`, ends up in the name or
+version, rather than being interpreted.
 
 #### Accessing fields
 
@@ -204,9 +204,8 @@ val modName = "coursier"
 val mod2: AnyModule = mod"io.get-coursier::$modName"
 ```
 
-The interpolated strings are validated at compile-time. As a consequence, string parameters
-(`modName` above) should not contain separators (these will be part of the name, …,
-else).
+Like for dependencies, interpolated values (`modName` above) are inserted as is, after the
+interpolated string has been validated at compile-time.
 
 #### Accessing fields
 
