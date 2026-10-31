@@ -191,14 +191,12 @@ assert(ScalaVersion.nativeBinary("0.4.0") == Some("0.4"))
 
 #### To coursier interface dependency
 
-Add a dependency towards `io.get-coursier::dependency-interface`:
-
 Add `io.get-coursier::dependency-interface:0.3.3` to your build:
 ```scala
+// Mill
+def mvnDeps = Seq(mvn"io.get-coursier::dependency-interface:0.3.3")
 // sbt
 libraryDependencies += "io.get-coursier" %% "dependency-interface" % "0.3.3"
-// mill
-def mvnDeps = Seq(mvn"io.get-coursier::dependency-interface:0.3.3")
 ```
 
 Then do
