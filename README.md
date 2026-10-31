@@ -18,7 +18,7 @@
 Add `io.get-coursier::dependency::0.3.3` to your build:
 ```scala
 // Mill
-def ivyDeps = Agg(ivy"io.get-coursier::dependency::0.3.3")
+def mvnDeps = Seq(mvn"io.get-coursier::dependency::0.3.3")
 // sbt
 libraryDependencies += "io.get-coursier" %%% "dependency" % "0.3.3"
 ```
@@ -198,7 +198,7 @@ Add `io.get-coursier::dependency-interface:0.3.3` to your build:
 // sbt
 libraryDependencies += "io.get-coursier" %% "dependency-interface" % "0.3.3"
 // mill
-def ivyDeps = Agg(ivy"io.get-coursier::dependency-interface:0.3.3")
+def mvnDeps = Seq(mvn"io.get-coursier::dependency-interface:0.3.3")
 ```
 
 Then do
