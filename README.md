@@ -104,6 +104,13 @@ val maybeDependency: Either[String, AnyDependency] = DependencyParser.parse(inpu
 val dep = maybeDependency.toOption.get
 ```
 
+Parsing errors are returned as a `Left`, while invalid input passed to the string interpolators
+below is a compile-time error:
+```scala mdoc
+assert(DependencyParser.parse("coursier") == Left("malformed module: coursier"))
+assert(DependencyParser.parse("io/get-coursier:coursier:2.0.6") == Left("organization io/get-coursier contains invalid '/'"))
+```
+
 #### Converting to pure Java dependency
 
 ```scala mdoc
