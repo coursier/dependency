@@ -116,10 +116,18 @@ assert(javaDep.toString == "io.get-coursier:coursier_2.13:2.0.6")
 #### Converting to pure Java dependency with a platform
 
 ```scala mdoc
-val platformParams = ScalaParameters("2.13.6").copy(platform = Some("myplatform2"))
+val platformParams = ScalaParameters("2.13.6").copy(platform = Some("sjs1"))
 val otherJavaDep: Dependency = dep"io.get-coursier::coursier::2.0.6".applyParams(platformParams)
 
-assert(otherJavaDep.toString == "io.get-coursier:coursier_myplatform2_2.13:2.0.6")
+assert(otherJavaDep.toString == "io.get-coursier:coursier_sjs1_2.13:2.0.6")
+```
+
+The platform, like `sjs1` for Scala.js 1.x or `native0.5` for Scala Native 0.5.x, is only added to
+dependencies with a `::` before their version:
+```scala mdoc
+val noPlatformDep: Dependency = dep"io.get-coursier::coursier:2.0.6".applyParams(platformParams)
+
+assert(noPlatformDep.toString == "io.get-coursier:coursier_2.13:2.0.6")
 ```
 
 #### String interpolator
