@@ -1,7 +1,7 @@
 package millbuild
 
 import coursier.cache.{ArchiveCache, ArtifactError}
-import coursier.util.{Artifact, Task}
+import coursier.util.Artifact
 
 import java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE
 import java.util.Locale
@@ -39,9 +39,9 @@ object CoursierLauncher {
     val url =
       s"https://github.com/coursier/coursier/releases/download/v${Versions.coursier}/$name.$ext"
 
-    val archiveCache = ArchiveCache[Task]()
-    val extracted = archiveCache.get(Artifact(url).withChanging(false))
-      .unsafeRun()(archiveCache.cache.ec) match {
+    val archiveCache = ArchiveCache()
+    val extracted = archiveCache.get(Artifact(url))
+      .unsafeRun()(using archiveCache.cache.ec) match {
       case Left(err: ArtifactError) =>
         throw new Exception(s"Error downloading coursier launcher from $url", err)
       case Right(f) => os.Path(f)
