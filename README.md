@@ -309,15 +309,18 @@ dep"io.get-coursier::coursier:2.0.6".applyParams(ScalaParameters("2.13.6")).toCs
 ## Contributing
 
 *dependency* is built with [Mill](https://mill-build.org). The `mill` launcher is in the repository,
-and needs a JVM:
+and downloads Mill and a JVM itself, so nothing needs to be installed beforehand (except on Linux
+systems with a glibc too old for Mill's native launcher, where it falls back to one that needs a
+JVM):
 ```text
 $ ./mill -i __.test                       # run the tests
 $ ./mill -i __.mimaReportBinaryIssues     # check binary compatibility
 $ ./mill -i mdoc                          # compile the README examples
 ```
 
-`mdoc` needs the [`cs` command](https://get-coursier.io/docs/cli-installation). It leaves
-`README.md` as is, and only checks that the examples in `scala mdoc` code blocks compile and run.
+`mdoc` runs mdoc with the [coursier launcher](https://get-coursier.io/docs/cli-overview), which the
+build downloads itself (its version is pinned in `mill-build/src/Deps.scala`). It leaves `README.md`
+as is, and only checks that the examples in `scala mdoc` code blocks compile and run.
 
 Versions are deduced from `v*` git tags. Pushes to `main` publish snapshots, and pushing a tag
 uploads a release to Sonatype Central, where it still has to be released manually.
