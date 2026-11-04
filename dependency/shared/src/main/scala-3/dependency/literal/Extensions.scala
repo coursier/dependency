@@ -158,7 +158,7 @@ object Extensions {
     }
   }
 
-  def parseModule(strCtxExpr: Expr[StringContext], argsExpr: Expr[Seq[Any]])(using Quotes): Expr[ModuleLike[NameAttributes]] = {
+  def parseModule(strCtxExpr: Expr[StringContext], argsExpr: Expr[Seq[String]])(using Quotes): Expr[ModuleLike[NameAttributes]] = {
 
     val inputs = inputStrings(strCtxExpr)
     val mappings = Mappings.from(inputs, argsExpr)
@@ -173,7 +173,7 @@ object Extensions {
     }
   }
 
-  def parseDependency(strCtxExpr: Expr[StringContext], argsExpr: Expr[Seq[Any]])(using Quotes): Expr[DependencyLike[NameAttributes, NameAttributes]] = {
+  def parseDependency(strCtxExpr: Expr[StringContext], argsExpr: Expr[Seq[String]])(using Quotes): Expr[DependencyLike[NameAttributes, NameAttributes]] = {
 
     val inputs = inputStrings(strCtxExpr)
     val mappings = Mappings.from(inputs, argsExpr)
@@ -191,8 +191,8 @@ object Extensions {
 
 trait Extensions {
   extension (inline sc: StringContext)
-    transparent inline def mod(inline args: Any*): ModuleLike[NameAttributes] =
+    transparent inline def mod(inline args: String*): ModuleLike[NameAttributes] =
       ${Extensions.parseModule('sc, 'args)}
-    transparent inline def dep(inline args: Any*): DependencyLike[NameAttributes, NameAttributes] =
+    transparent inline def dep(inline args: String*): DependencyLike[NameAttributes, NameAttributes] =
       ${Extensions.parseDependency('sc, 'args)}
 }

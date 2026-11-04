@@ -103,4 +103,16 @@ class LiteralTests extends munit.FunSuite {
     val depWithParams = dep"io.get-coursier::coursier:2.0.6,url=https://dl.cs/cs.jar,intransitive"
     assert(depWithParams.userParams == Seq("url" -> Some("https://dl.cs/cs.jar"), "intransitive" -> None))
   }
+
+  test("non-String interpolated values are rejected") {
+    val ver = Some("1.2")
+    val num = 2
+    assert(compileErrors("""dep"org:name:$ver"""").nonEmpty)
+    assert(compileErrors("""dep"org:name:1.$num"""").nonEmpty)
+    assert(compileErrors("""mod"org:$ver"""").nonEmpty)
+    assert(compileErrors("""mod"org:name$num"""").nonEmpty)
+    // sanity check: the same snippets compile fine with String values
+    assert(compileErrors("""dep"org:name:${ver.get}"""").isEmpty)
+    assert(compileErrors("""mod"org:name${num.toString}"""").isEmpty)
+  }
 }
