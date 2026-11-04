@@ -29,12 +29,12 @@
 
 ## Usage
 
-Add `io.get-coursier::dependency::0.3.3` to your build:
+Add `io.get-coursier::dependency::0.3.4` to your build:
 ```scala
 // Mill
-def mvnDeps = Seq(mvn"io.get-coursier::dependency::0.3.3")
+def mvnDeps = Seq(mvn"io.get-coursier::dependency::0.3.4")
 // sbt
-libraryDependencies += "io.get-coursier" %%% "dependency" % "0.3.3"
+libraryDependencies += "io.get-coursier" %%% "dependency" % "0.3.4"
 ```
 
 The latest version is [![Maven Central](https://img.shields.io/maven-central/v/io.get-coursier/dependency_3.svg)](https://maven-badges.herokuapp.com/maven-central/io.get-coursier/dependency_3).
@@ -284,12 +284,12 @@ assert(ScalaVersion.nativeBinary("0.4.0") == Some("0.4"))
 
 #### To coursier interface dependency
 
-Add `io.get-coursier::dependency-interface:0.3.3` to your build:
+Add `io.get-coursier::dependency-interface:0.3.4` to your build:
 ```scala
 // Mill
-def mvnDeps = Seq(mvn"io.get-coursier::dependency-interface:0.3.3")
+def mvnDeps = Seq(mvn"io.get-coursier::dependency-interface:0.3.4")
 // sbt
-libraryDependencies += "io.get-coursier" %% "dependency-interface" % "0.3.3"
+libraryDependencies += "io.get-coursier" %% "dependency-interface" % "0.3.4"
 ```
 
 These conversions only accept `Module` and `Dependency`, so `applyParams` must be called first
@@ -324,7 +324,9 @@ build downloads itself (its version is pinned in `mill-build/src/Deps.scala`). I
 as is, and only checks that the examples in `scala mdoc` code blocks compile and run.
 
 Versions are deduced from `v*` git tags. Pushes to `main` publish snapshots, and pushing a tag
-uploads a release to Sonatype Central, where it still has to be released manually.
+uploads a release to Sonatype Central, where it still has to be released manually. Snapshots and
+releases are also published to [GitHub Packages](https://github.com/orgs/coursier/packages), on a
+best-effort basis.
 
 ## License
 
