@@ -17,9 +17,6 @@ jobs:
         fetch-depth: 0
         submodules: true
     - uses: coursier/cache-action@v9
-    - uses: coursier/setup-action@v3
-      with:
-        jvm: 21
     - name: Test
       run: ./mill -i __.test
     - name: Validate README
@@ -34,9 +31,6 @@ jobs:
         fetch-depth: 0
         submodules: true
     - uses: coursier/cache-action@v9
-    - uses: coursier/setup-action@v3
-      with:
-        jvm: 21
     - name: MiMA
       run: ./mill -i __.mimaReportBinaryIssues
 
@@ -50,9 +44,6 @@ jobs:
         fetch-depth: 0
         submodules: true
     - uses: coursier/cache-action@v9
-    - uses: coursier/setup-action@v3
-      with:
-        jvm: 21
     - name: Release
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
