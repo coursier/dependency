@@ -64,10 +64,10 @@ private[literal] final case class Mappings(mappings: List[(String, QExpr[String]
 }
 
 object Mappings {
-  def from(inputs: Seq[String], argsExpr: QExpr[Seq[Any]])(using Quotes): Mappings = {
+  def from(inputs: Seq[String], argsExpr: QExpr[Seq[String]])(using Quotes): Mappings = {
     val mappings = (0 until (inputs.length - 1)).toList.map { idx =>
       val id = UUID.randomUUID().toString.filter(_ != '-')
-      (id, '{${argsExpr}.apply(${QExpr(idx)}).toString})
+      (id, '{${argsExpr}.apply(${QExpr(idx)})})
     }
     Mappings(mappings)
   }

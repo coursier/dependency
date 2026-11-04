@@ -163,7 +163,8 @@ val dep2: AnyDependency = dep"io.get-coursier::$depName:$ver"
 
 The interpolated strings are validated at compile-time. Interpolated values (`depName`, `ver` above)
 are inserted as is afterwards, so any separator they contain, like `:`, ends up in the name or
-version, rather than being interpreted.
+version, rather than being interpreted. Interpolated values must be `String`s: anything else, like
+an `Option[String]` or an `Int`, is a compile-time error.
 
 #### Accessing fields
 

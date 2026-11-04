@@ -5,11 +5,11 @@ import scala.language.experimental.macros
 
 trait Extensions {
   implicit class moduleString(val sc: StringContext) {
-    def mod(args: Any*): ModuleLike[NameAttributes] =
+    def mod(args: String*): ModuleLike[NameAttributes] =
       macro ModuleLiteralMacros.module
   }
   implicit class dependencyString(val sc: StringContext) {
-    def dep(args: Any*): DependencyLike[NameAttributes, NameAttributes] =
+    def dep(args: String*): DependencyLike[NameAttributes, NameAttributes] =
       macro DependencyLiteralMacros.dependency
   }
 }
