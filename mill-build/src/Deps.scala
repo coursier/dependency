@@ -24,6 +24,6 @@ object Versions {
   // Version of the coursier launcher downloaded by the build (see CoursierLauncher)
   def coursier = "2.1.26"
   def mdoc = "2.3.6"
-  def scalaJs = "1.22.0"
+  def scalaJs = "1.23.0"
   def scalaNative = "0.5.12"
 }
